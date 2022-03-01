@@ -6,11 +6,15 @@ class RCCamera extends Camera {
     constructor(wcCenter, wcWidth, viewportArray, bound)
     {
         super(wcCenter, wcWidth, viewportArray, bound);
-        this.fov = Math.PI/2;
-        this.resolution = 100;
+        this.fov = Math.PI/4;
+        this.resolution = 20;
         this.raycasterPosition = [12.5, 12.5];
         this.raycasterAngle = 0;
         this.raycastLengths = [];
+        this.maxHeight = 30.0;
+        this.minHeight = 5.0;
+        this.maxDistance = 10.0;
+        this.minDistance = 1.3;
     }
     Raycast(GridMap)
     {
@@ -149,7 +153,25 @@ class RCCamera extends Camera {
         let width = this.getWCWidth();
         for (let i = 0; i < this.resolution; i++) {
             let xpos = xStart + (i/this.resolution)*width;
-            let height = 30/this.raycastLengths[i] + 1;
+            //let height = 30/this.raycastLengths[i] + 1;
+            let height = 0;
+            if(this.raycastLengths[i] < this.minDistance)
+            {
+                height = this.maxHeight;
+            }
+            else if(this.raycastLengths[i] > this.maxDistance)
+            {
+                height = this.minHeight;
+            }
+            else{
+                
+                let r = (this.raycastLengths[i] - this.minDistance)/(this.maxDistance - this.minDistance);
+                if (i == 4)
+                {
+                    console.log(r);
+                }
+                height = this.minHeight + (this.maxHeight - this.minHeight) * (1- r);
+            }
             let yStart = ymiddle + height/2;
             let yEnd = ymiddle - height/2;
             //console.log("line " + i + " xpos: " + xpos + "height: " + height);
@@ -159,7 +181,7 @@ class RCCamera extends Camera {
             renderable.getXform().setSize(width/this.resolution, height);
             renderable.setColor([0,0,0,1]);
             renderable.draw(this);
-
+            
         }
 
     }
