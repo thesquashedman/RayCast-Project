@@ -7,17 +7,13 @@ class RCCamera extends Camera {
     {
         super(wcCenter, wcWidth, viewportArray, bound);
         this.fov = Math.PI/3;
-        this.resolution = 50;
+        this.resolution = 500;
         this.raycasterPosition = [12.5, 12.5];
         this.raycasterAngle = 0;
         this.raycastLengths = [];
         this.raycastHitPosition = [];
         this.raycastHitDirection = []; //True corresponds to hitting top or bottom wall, false corresponds to hitting left or right wall.
         this.rayAngles = [];
-        this.maxHeight = 60.0;
-        this.minHeight = 5.0;
-        this.maxDistance = 20.0;
-        this.minDistance = 2;
     }
     Raycast(GridMap)
     {
@@ -168,28 +164,14 @@ class RCCamera extends Camera {
         let width = this.getWCWidth();
         for (let i = 0; i < this.resolution; i++) {
             let xpos = xStart + (i/this.resolution)*width;
-            //let height = 30/this.raycastLengths[i] + 1;
-            let height = 0;
-            //let tValue = Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
             
             
+            let r = this.raycastLengths[i] * Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
+            let height = this.getWCHeight() / r;
             
-            if(this.raycastLengths[i] < this.minDistance)
-            {
-                height = this.maxHeight;
-            }
-            else if(this.raycastLengths[i] > this.maxDistance)
-            {
-                height = this.minHeight;
-            }
-            else{
-                
-                let r = (this.raycastLengths[i] - this.minDistance)/(this.maxDistance - this.minDistance);
-                height = this.minHeight + (this.maxHeight - this.minHeight) * (1- r);
-                height /= Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
                 
                 
-            }
+            
             let yStart = ymiddle + height/2;
             let yEnd = ymiddle - height/2;
             //console.log("line " + i + " xpos: " + xpos + "height: " + height);

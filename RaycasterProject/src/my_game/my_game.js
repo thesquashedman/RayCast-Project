@@ -20,7 +20,7 @@ class MyGame extends engine.Scene {
             100,                       // width of camera
             [0, 0, 640, 480]           // viewport (orgX, orgY, width, height)
         );
-        this.mCamera.setBackgroundColor([0, 0.8, 0.8, 1]);
+        this.mCamera.setBackgroundColor([0, 0, 0, 1]);
         this.mGridMap = new engine.GridMap();
         this.mCamera.Raycast(this.mGridMap);
 
