@@ -58,12 +58,14 @@ class MyGame extends engine.Scene {
         //engine.clearCanvas([0.7, 0.9, 0.9, 1.0]); // clear to light gray
         this.mCamera.setViewAndCameraMatrix();
         this.mCamera.DrawRays();
+        
 
         this.mMapCam.setViewAndCameraMatrix();
         for (let i = 0; i < this.mGridMap2DRenderables.length; i++) {
             this.mGridMap2DRenderables[i].draw(this.mMapCam);
         }
         this.mMapCharRenderable.draw(this.mMapCam);
+        this.mCamera.drawRayLines(this.mMapCam);
         this.mMapCharLineR.draw(this.mMapCam);
         
         

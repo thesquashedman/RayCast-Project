@@ -6,19 +6,25 @@ class RCCamera extends Camera {
     constructor(wcCenter, wcWidth, viewportArray, bound)
     {
         super(wcCenter, wcWidth, viewportArray, bound);
-        this.fov = Math.PI/4;
-        this.resolution = 20;
+        this.fov = Math.PI/3;
+        this.resolution = 50;
         this.raycasterPosition = [12.5, 12.5];
         this.raycasterAngle = 0;
         this.raycastLengths = [];
-        this.maxHeight = 30.0;
+        this.raycastHitPosition = [];
+        this.raycastHitDirection = []; //True corresponds to hitting top or bottom wall, false corresponds to hitting left or right wall.
+        this.rayAngles = [];
+        this.maxHeight = 60.0;
         this.minHeight = 5.0;
-        this.maxDistance = 10.0;
-        this.minDistance = 1.3;
+        this.maxDistance = 20.0;
+        this.minDistance = 2;
     }
     Raycast(GridMap)
     {
         this.raycastLengths = []; // empty it
+        this.raycastHitPosition = [];
+        this.raycastHitDirection = [];
+        this.rayAngles = [];
         for(let i = 0; i < this.resolution; i++)
         {
             let theta = this.raycasterAngle + this.fov/2 - i * (this.fov/(this.resolution - 1));
@@ -30,6 +36,7 @@ class RCCamera extends Camera {
     }
     _CastRay(theta, GridMap)
     {
+        this.rayAngles.push(theta);
         let positionInGrid = [this.raycasterPosition[0] - GridMap.getPosition()[0], this.raycasterPosition[1] - GridMap.getPosition()[1]];
         let numberOfTime = 0;
         let currentDistance = 0;
@@ -62,7 +69,7 @@ class RCCamera extends Camera {
             }
             else
             {
-                //If it's PI or 0, we never intersect any Y lines, so we don't care about it
+                //Should never get here
                 nextY = null;
             }
             
@@ -84,7 +91,7 @@ class RCCamera extends Camera {
             }
             else
             {
-                //If it's PI/2 or 3/2 PI, we never intersect any X lines, so we don't care about it
+                //Should never get here
                 nextX = null;
             }
             let yOfX = positionInGrid[1] + ((nextX - positionInGrid[0]) * Math.tan(theta));
@@ -109,6 +116,8 @@ class RCCamera extends Camera {
                     if(GridMap.getTileAtIndex(xIndex, yIndex))
                     {
                         //console.log(positionInGrid[0] + " " + positionInGrid[1]);
+                        this.raycastHitPosition.push(positionInGrid);
+                        this.raycastHitDirection.push(true);
                         return currentDistance;
                     }
                 }
@@ -130,6 +139,8 @@ class RCCamera extends Camera {
                     if(GridMap.getTileAtIndex(xIndex, yIndex))
                     {
                         //console.log(positionInGrid[0] + " " + positionInGrid[1]);
+                        this.raycastHitPosition.push(positionInGrid);
+                        this.raycastHitDirection.push(false);
                         return currentDistance;
                     }
                 }
@@ -138,12 +149,16 @@ class RCCamera extends Camera {
             numberOfTime++;
             if(numberOfTime >250)
             {
+                this.raycastHitPosition.push([null, null]);
+                this.raycastHitDirection.push(null);
                 return -15;
             }
 
 
         }
         //If it gets outside the GridMap, return -1 to show that it didn't hit
+        this.raycastHitPosition.push([null, null]);
+        this.raycastHitDirection.push(null);
         return -1;
     }
 
@@ -155,6 +170,10 @@ class RCCamera extends Camera {
             let xpos = xStart + (i/this.resolution)*width;
             //let height = 30/this.raycastLengths[i] + 1;
             let height = 0;
+            //let tValue = Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
+            
+            
+            
             if(this.raycastLengths[i] < this.minDistance)
             {
                 height = this.maxHeight;
@@ -166,11 +185,10 @@ class RCCamera extends Camera {
             else{
                 
                 let r = (this.raycastLengths[i] - this.minDistance)/(this.maxDistance - this.minDistance);
-                if (i == 4)
-                {
-                    console.log(r);
-                }
                 height = this.minHeight + (this.maxHeight - this.minHeight) * (1- r);
+                height /= Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
+                
+                
             }
             let yStart = ymiddle + height/2;
             let yEnd = ymiddle - height/2;
@@ -179,13 +197,37 @@ class RCCamera extends Camera {
             let renderable = new engine.Renderable(); // this can be a texture later.
             renderable.getXform().setPosition(xpos, ymiddle);
             renderable.getXform().setSize(width/this.resolution, height);
-            renderable.setColor([0,0,0,1]);
+            if(this.raycastHitDirection[i])
+            {
+                renderable.setColor([0.1,0.1,0.1,1]);
+            }
+            else{
+                renderable.setColor([0.2,0.2,0.2,1]);
+            }
+            
+            
+            
             renderable.draw(this);
+            
             
         }
 
     }
-    
+    drawRayLines(secondCamera)
+    {
+
+        //secondCamera.setViewAndCameraMatrix();
+        for (let i = 0; i < this.resolution; i++) {
+            let lineRay = new engine.LineRenderable();
+            lineRay.setColor([0,1,0,1]);
+            lineRay.setFirstVertex(this.raycasterPosition[0], this.raycasterPosition[1]);
+            lineRay.setSecondVertex(this.raycastHitPosition[i][0], this.raycastHitPosition[i][1]);
+            
+            lineRay.draw(secondCamera);
+        }
+        
+    }
+
     setRayCasterAngle(t) {
         this.raycasterAngle = t;
     }
