@@ -16,7 +16,7 @@ class MyGame extends engine.Scene {
     init() {
 
         this.mCamera = new engine.RCCamera(
-            vec2.fromValues(30, 27.5), // position of the camera
+            vec2.fromValues(50, 27.5), // position of the camera
             100,                       // width of camera
             [0, 0, 640, 480]           // viewport (orgX, orgY, width, height)
         );
@@ -91,6 +91,17 @@ class MyGame extends engine.Scene {
         {
             this.mCamera.enableEffect1();
         }
+        if(this.mCamera.mouseWCX() > 60)
+        {
+            let r = (this.mCamera.mouseWCX() - 60) / 40
+            this.mCamera.moveRayCasterAngle(-0.06 * r);
+        }
+        if(this.mCamera.mouseWCX() < 40)
+        {
+            let r = this.mCamera.mouseWCX() / 40
+            this.mCamera.moveRayCasterAngle(0.06 * (1 -r));
+        }
+
 
         let pos = this.mCamera.getRayCasterPos();
         let ang = this.mCamera.getRayCasterAngle();

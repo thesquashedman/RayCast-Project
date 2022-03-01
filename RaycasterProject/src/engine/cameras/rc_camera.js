@@ -6,7 +6,7 @@ class RCCamera extends Camera {
     constructor(wcCenter, wcWidth, viewportArray, bound)
     {
         super(wcCenter, wcWidth, viewportArray, bound);
-        this.fov =  Math.PI;
+        this.fov =  Math.PI/2;
         this.resolution = 50;
         this.raycasterPosition = [12.5, 12.5];
         this.raycasterAngle = 0;
