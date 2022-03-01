@@ -87,6 +87,10 @@ class MyGame extends engine.Scene {
         if (engine.input.isKeyPressed(engine.input.keys.S)) {
             this.mCamera.moveRayCasterForward(-0.09);
         }
+        if(engine.input.isKeyClicked(engine.input.keys.Space))
+        {
+            this.mCamera.enableEffect1();
+        }
 
         let pos = this.mCamera.getRayCasterPos();
         let ang = this.mCamera.getRayCasterAngle();

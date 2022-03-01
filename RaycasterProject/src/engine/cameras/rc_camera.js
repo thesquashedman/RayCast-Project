@@ -6,14 +6,15 @@ class RCCamera extends Camera {
     constructor(wcCenter, wcWidth, viewportArray, bound)
     {
         super(wcCenter, wcWidth, viewportArray, bound);
-        this.fov = Math.PI/3;
-        this.resolution = 500;
+        this.fov =  Math.PI;
+        this.resolution = 50;
         this.raycasterPosition = [12.5, 12.5];
         this.raycasterAngle = 0;
         this.raycastLengths = [];
         this.raycastHitPosition = [];
         this.raycastHitDirection = []; //True corresponds to hitting top or bottom wall, false corresponds to hitting left or right wall.
         this.rayAngles = [];
+        this.effect1 = true;
     }
     Raycast(GridMap)
     {
@@ -164,10 +165,25 @@ class RCCamera extends Camera {
         let width = this.getWCWidth();
         for (let i = 0; i < this.resolution; i++) {
             let xpos = xStart + (i/this.resolution)*width;
+            xpos += 1/(2 * this.resolution) * width; // Moves it over slightly so that it fills the screen.
             
             
             let r = this.raycastLengths[i] * Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
+
+            //Applies back warping if the angle is greater than 45 degrees, not necissary but effect makes FOVS greater than 90 degrees less vomit inducing
+            if(Math.abs(this.rayAngles[i] - this.raycasterAngle) > Math.PI/4 && this.effect1)
+            {
+                r /= Math.abs(Math.cos(2 * (this.rayAngles[i] - this.raycasterAngle) - Math.PI/2));
+            }
+            if(r == 0)
+            {
+                r = 0.000001;
+            }
             let height = this.getWCHeight() / r;
+            if(height > this.getWCHeight())
+            {
+                height = this.getWCHeight();
+            }
             
                 
                 
@@ -178,13 +194,13 @@ class RCCamera extends Camera {
 
             let renderable = new engine.Renderable(); // this can be a texture later.
             renderable.getXform().setPosition(xpos, ymiddle);
-            renderable.getXform().setSize(width/this.resolution, height);
+            renderable.getXform().setSize(width/(this.resolution), height);
             if(this.raycastHitDirection[i])
             {
-                renderable.setColor([0.1,0.1,0.1,1]);
+                renderable.setColor([0.4,0.1,0.1,1]);
             }
             else{
-                renderable.setColor([0.2,0.2,0.2,1]);
+                renderable.setColor([0.6,0.2,0.2,1]);
             }
             
             
@@ -230,5 +246,10 @@ class RCCamera extends Camera {
     getRayCasterAngle() {
         return this.raycasterAngle;
     }
+    enableEffect1()
+    {
+        this.effect1 = !this.effect1;
+    }
+
 }
 export default RCCamera;
