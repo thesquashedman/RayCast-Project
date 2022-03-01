@@ -1,3 +1,4 @@
+import engine from "../index.js";
 import Camera from "./camera.js";
 
 class RCCamera extends Camera {
@@ -5,19 +6,21 @@ class RCCamera extends Camera {
     constructor(wcCenter, wcWidth, viewportArray, bound)
     {
         super(wcCenter, wcWidth, viewportArray, bound);
-        this.fov = Math.PI;
-        this.resolution = 50;
+        this.fov = Math.PI/2;
+        this.resolution = 100;
         this.raycasterPosition = [12.5, 12.5];
         this.raycasterAngle = 0;
         this.raycastLengths = [];
     }
     Raycast(GridMap)
     {
+        this.raycastLengths = []; // empty it
         for(let i = 0; i < this.resolution; i++)
         {
             let theta = this.raycasterAngle + this.fov/2 - i * (this.fov/(this.resolution - 1));
             this.raycastLengths.push(this._CastRay(theta, GridMap));
-            console.log("length: " + this.raycastLengths[i] + " Angle: " + theta);
+            //console.log("length: " + this.raycastLengths[i] + " Angle: " + theta);
+
         }
         
     }
@@ -101,7 +104,7 @@ class RCCamera extends Camera {
                 {
                     if(GridMap.getTileAtIndex(xIndex, yIndex))
                     {
-                        console.log(positionInGrid[0] + " " + positionInGrid[1]);
+                        //console.log(positionInGrid[0] + " " + positionInGrid[1]);
                         return currentDistance;
                     }
                 }
@@ -122,7 +125,7 @@ class RCCamera extends Camera {
                 {
                     if(GridMap.getTileAtIndex(xIndex, yIndex))
                     {
-                        console.log(positionInGrid[0] + " " + positionInGrid[1]);
+                        //console.log(positionInGrid[0] + " " + positionInGrid[1]);
                         return currentDistance;
                     }
                 }
@@ -139,6 +142,47 @@ class RCCamera extends Camera {
         //If it gets outside the GridMap, return -1 to show that it didn't hit
         return -1;
     }
+
+    DrawRays() {
+        let xStart = this.getWCCenter()[0]-this.getWCWidth()/2;
+        let ymiddle = this.getWCCenter()[1];
+        let width = this.getWCWidth();
+        for (let i = 0; i < this.resolution; i++) {
+            let xpos = xStart + (i/this.resolution)*width;
+            let height = 30/this.raycastLengths[i] + 1;
+            let yStart = ymiddle + height/2;
+            let yEnd = ymiddle - height/2;
+            //console.log("line " + i + " xpos: " + xpos + "height: " + height);
+
+            let renderable = new engine.Renderable(); // this can be a texture later.
+            renderable.getXform().setPosition(xpos, ymiddle);
+            renderable.getXform().setSize(width/this.resolution, height);
+            renderable.setColor([0,0,0,1]);
+            renderable.draw(this);
+
+        }
+
+    }
     
+    setRayCasterAngle(t) {
+        this.raycasterAngle = t;
+    }
+
+    moveRayCasterAngle(d) {
+        this.raycasterAngle += d;
+    }
+
+    moveRayCasterForward(d) {
+        this.raycasterPosition[0] += Math.cos(this.raycasterAngle)*d;
+        this.raycasterPosition[1] += Math.sin(this.raycasterAngle)*d;
+    }
+
+    getRayCasterPos() {
+        return this.raycasterPosition;
+    }
+
+    getRayCasterAngle() {
+        return this.raycasterAngle;
+    }
 }
 export default RCCamera;

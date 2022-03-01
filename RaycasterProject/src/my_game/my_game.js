@@ -10,119 +10,88 @@ class MyGame extends engine.Scene {
         // The camera to view the scene
         this.mCamera = null;
         this.mGridMap = null;
-        /*
-        this.mMsg = null;
-    
-        this.mLineSet = [];
-        this.mCurrentLine = null;
-        this.mP1 = null;
 
-        this.mShowLine = true;
-        */
     }
         
     init() {
 
-        
-        // Step A: set up the cameras
         this.mCamera = new engine.RCCamera(
             vec2.fromValues(30, 27.5), // position of the camera
             100,                       // width of camera
             [0, 0, 640, 480]           // viewport (orgX, orgY, width, height)
         );
-        this.mCamera.setBackgroundColor([0.8, 0.8, 0.8, 1]);
+        this.mCamera.setBackgroundColor([0, 0.8, 0.8, 1]);
         this.mGridMap = new engine.GridMap();
         this.mCamera.Raycast(this.mGridMap);
-        
-                // sets the background to gray
-        /*
-        this.mMsg = new engine.FontRenderable("Status Message");
-        this.mMsg.setColor([0, 0, 0, 1]);
-        this.mMsg.getXform().setPosition(-19, -8);
-        this.mMsg.setTextHeight(3);
-        */
+
+        this.mMapCam = new engine.Camera(
+            vec2.fromValues(12.5, 12.5), // position of the camera
+            100,                       // width of camera
+            [0, 480, 640, 240]           // viewport (orgX, orgY, width, height)
+        );
+
+        this.mGridMap2DRenderables = [];
+
+        let height = this.mGridMap.getHeight()/this.mGridMap.getHeightOfTile();
+        let width = this.mGridMap.getWidth()/this.mGridMap.getWidthOfTile();
+        let offset = this.mGridMap.getWidthOfTile()/2;
+        for (let i = 0; i < width; i++) {
+            for (let j = 0; j < height; j++) {
+                if (!this.mGridMap.getTileAtIndex(i, j)) {
+                    continue;
+                }
+                let renderable = new engine.Renderable();
+                renderable.getXform().setPosition(this.mGridMap.getWidthOfTile()*i+offset, this.mGridMap.getHeightOfTile()*j+offset);
+                renderable.getXform().setSize(this.mGridMap.getWidthOfTile(), this.mGridMap.getHeightOfTile());
+                this.mGridMap2DRenderables.push(renderable);
+            }
+        }
+        this.mMapCharRenderable = new engine.Renderable();
+        this.mMapCharRenderable.setColor([1,0,0,1]);
+        this.mMapCharLineR = new engine.LineRenderable();
+
+
     }
     
-    // This is the draw function, make sure to setup proper drawing environment, and more
-    // importantly, make sure to _NOT_ change any state.
     draw() {
-        // Step A: clear the canvas
 
-        
-        engine.clearCanvas([0.9, 0.9, 0.9, 1.0]); // clear to light gray
-        /*
+        //engine.clearCanvas([0.7, 0.9, 0.9, 1.0]); // clear to light gray
         this.mCamera.setViewAndCameraMatrix();
-        let i, l;
-        for (i = 0; i < this.mLineSet.length; i++) {
-            l = this.mLineSet[i];
-            l.draw(this.mCamera);
+        this.mCamera.DrawRays();
+
+        this.mMapCam.setViewAndCameraMatrix();
+        for (let i = 0; i < this.mGridMap2DRenderables.length; i++) {
+            this.mGridMap2DRenderables[i].draw(this.mMapCam);
         }
-        this.mMsg.draw(this.mCamera);   // only draw status in the main camera
-        */
+        this.mMapCharRenderable.draw(this.mMapCam);
+        this.mMapCharLineR.draw(this.mMapCam);
+        
+        
     }
     
-    // The Update function, updates the application state. Make sure to _NOT_ draw
-    // anything from this function!
     update () {
-
-
-
-
-        /*
-        let msg = "Lines: " + this.mLineSet.length + " ";
-        let echo = "";
-        let x, y;
+        this.mCamera.Raycast(this.mGridMap);
         
-        // show line or point
-        if  (engine.input.isKeyClicked(engine.input.keys.P)) {
-            this.mShowLine = !this.mShowLine;
-            let line = null;
-            if (this.mCurrentLine !== null)
-                line = this.mCurrentLine;
-            else {
-                if (this.mLineSet.length > 0)
-                    line = this.mLineSet[this.mLineSet.length-1];
-            }
-            if (line !== null)
-                line.setShowLine(this.mShowLine);
+        if (engine.input.isKeyPressed(engine.input.keys.A)) {
+            this.mCamera.moveRayCasterAngle(0.03);
         }
-    
-        if (engine.input.isButtonPressed(engine.input.eMouseButton.eMiddle)) {
-            let len = this.mLineSet.length;
-            if (len > 0) {
-                this.mCurrentLine = this.mLineSet[len - 1];
-                x = this.mCamera.mouseWCX();
-                y = this.mCamera.mouseWCY();
-                echo += "Selected " + len + " ";
-                echo += "[" + x.toPrecision(2) + " " + y.toPrecision(2) + "]";
-                this.mCurrentLine.setFirstVertex(x, y);
-            }
+        if (engine.input.isKeyPressed(engine.input.keys.D)) {
+            this.mCamera.moveRayCasterAngle(-0.03);
         }
-    
-        if (engine.input.isButtonPressed(engine.input.eMouseButton.eLeft)) {
-            x = this.mCamera.mouseWCX();
-            y = this.mCamera.mouseWCY();
-            echo += "[" + x.toPrecision(2) + " " + y.toPrecision(2) + "]";
-    
-            if (this.mCurrentLine === null) { // start a new one
-                this.mCurrentLine = new engine.LineRenderable();
-                this.mCurrentLine.setFirstVertex(x, y);
-                this.mCurrentLine.setPointSize(5.0);
-                this.mCurrentLine.setShowLine(this.mShowLine);
-                this.mCurrentLine.setDrawVertices(true);
-                this.mLineSet.push(this.mCurrentLine);
-            } else {
-                this.mCurrentLine.setSecondVertex(x, y);
-            }
-        } else {
-            this.mCurrentLine = null;
-            this.mP1 = null;
+
+        if (engine.input.isKeyPressed(engine.input.keys.W)) {
+            this.mCamera.moveRayCasterForward(0.09);
         }
-    
-        msg += echo;
-        msg += " Show:" + (this.mShowLine ? "Ln" : "Pt");
-        this.mMsg.setText(msg);
-        */
+        if (engine.input.isKeyPressed(engine.input.keys.S)) {
+            this.mCamera.moveRayCasterForward(-0.09);
+        }
+
+        let pos = this.mCamera.getRayCasterPos();
+        let ang = this.mCamera.getRayCasterAngle();
+        let dist = 1.0;
+        this.mMapCharRenderable.getXform().setPosition(pos[0], pos[1]);
+        this.mMapCharLineR.setFirstVertex(pos[0], pos[1]);
+        this.mMapCharLineR.setSecondVertex(pos[0]+dist*Math.cos(ang), pos[1]+dist*Math.sin(ang));
     }
 }
 
