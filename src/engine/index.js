@@ -30,7 +30,7 @@ import ShakeVec2 from "./utils/shake_vec2.js";
 
 // camera and related supports
 import Camera from "./cameras/camera.js";
-import RCCamera from "./cameras/RC_camera.js";
+import RCCamera from "./cameras/rc_camera.js";
 
 // renderables 
 import Renderable from "./renderables/renderable.js";
