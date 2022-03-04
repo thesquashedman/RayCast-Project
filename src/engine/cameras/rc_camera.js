@@ -20,11 +20,18 @@ class RCCamera extends Camera {
         this.textureWidth = 32;
         this.textureHeight = 32;
         this.fisheye = false;
+        this.horizonLine = 0;
     }
     TempTextureSetter(texture)
     {
         this.tempTextureHolder = texture;
     }
+    TempTexWidthHeightSetter(width, height)
+    {
+        this.textureWidth = width;
+        this.textureHeight = height;
+    }
+    
     Raycast(GridMap)
     {
         this.raycastLengths = []; // empty it
@@ -212,7 +219,7 @@ class RCCamera extends Camera {
 
             //let renderable = new engine.Renderable(); // this can be a texture later.
             let renderable = new engine.SpriteRenderable(this.tempTextureHolder);
-            renderable.getXform().setPosition(xpos, ymiddle);
+            renderable.getXform().setPosition(xpos, ymiddle  + this.horizonLine);
             renderable.getXform().setSize(width/(this.resolution), height);
             //let pixelStart = 0;
             let pixelWidth = this.textureWidth / this.resolution;
@@ -225,10 +232,12 @@ class RCCamera extends Camera {
             let x = this.raycastHitPosition[i][temp] / 5;
             x = x - Math.floor(x);
             x = x * this.textureWidth;
-            if(x + pixelWidth > this.textureWidth)
+            /*
+            if(x + pixelWidth >= this.textureWidth)
             {
                 x = this.textureWidth - this.pixelWidth;
             }
+            */
             renderable.setElementPixelPositions(x, x + pixelWidth, 0, this.textureHeight);
 
             if(this.raycastHitDirection[i])
@@ -316,6 +325,10 @@ class RCCamera extends Camera {
     toggleFishEye()
     {
         this.fisheye = !this.fisheye;
+    }
+    incHorizonLine(d)
+    {
+        this.horizonLine += d;
     }
 
 }

@@ -6,7 +6,9 @@ class MyGame extends engine.Scene {
     constructor() {
         super();
 
-        this.kWall = "assets/wall1.png";
+        this.kWall1 = "assets/realisticwall.webp";
+        this.kWall2 = "assets/wall1.png";
+        this.kWall3 = "assets/missing_texture.png"
         // The camera to view the scene
         this.mCamera = null;
         this.mGridMap = null;
@@ -15,12 +17,17 @@ class MyGame extends engine.Scene {
     }
     load(){
 
-        engine.texture.load(this.kWall);
+        engine.texture.load(this.kWall1);
+        engine.texture.load(this.kWall2);
+        engine.texture.load(this.kWall3);
+        
 
     }
     unload()
     {
-        engine.texture.unload(this.kWall);
+        engine.texture.unload(this.kWall1);
+        engine.texture.unload(this.kWall2);
+        engine.texture.unload(this.kWall3);
     }
     init() {
 
@@ -30,7 +37,8 @@ class MyGame extends engine.Scene {
             [0, 0, 640, 480]           // viewport (orgX, orgY, width, height)
         );
         this.mCamera.setBackgroundColor([0, 0, 0, 1]);
-        this.mCamera.TempTextureSetter(this.kWall);
+        this.mCamera.TempTextureSetter(this.kWall1);
+        this.mCamera.TempTexWidthHeightSetter(1300, 1300);
         this.mGridMap = new engine.GridMap();
         this.mCamera.Raycast(this.mGridMap);
 
@@ -128,7 +136,29 @@ class MyGame extends engine.Scene {
         {
             this.mCamera.setResolution(this.mCamera.getResolution() + 0.5);
         }
-        
+        if(engine.input.isKeyClicked(engine.input.keys.One))
+        {
+            this.mCamera.TempTextureSetter(this.kWall1);
+            this.mCamera.TempTexWidthHeightSetter(1300, 1300);
+        }
+        if(engine.input.isKeyClicked(engine.input.keys.Two))
+        {
+            this.mCamera.TempTextureSetter(this.kWall2);
+            this.mCamera.TempTexWidthHeightSetter(32, 32);
+        }
+        if(engine.input.isKeyClicked(engine.input.keys.Three))
+        {
+            this.mCamera.TempTextureSetter(this.kWall3);
+            this.mCamera.TempTexWidthHeightSetter(200, 200);
+        }
+        if(engine.input.isKeyPressed(engine.input.keys.O))
+        {
+            this.mCamera.incHorizonLine(-0.3);
+        }
+        if(engine.input.isKeyPressed(engine.input.keys.P))
+        {
+            this.mCamera.incHorizonLine(0.3);
+        }
 
 
         if(this.mCamera.mouseWCX() > 60)
