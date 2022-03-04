@@ -6,7 +6,7 @@ class MyGame extends engine.Scene {
     constructor() {
         super();
 
-        this.kWall = "assets/wall_texture.png";
+        this.kWall = "assets/wall1.png";
         // The camera to view the scene
         this.mCamera = null;
         this.mGridMap = null;
