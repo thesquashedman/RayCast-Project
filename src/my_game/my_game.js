@@ -15,12 +15,12 @@ class MyGame extends engine.Scene {
     }
     load(){
 
-        engine.texture.load(this.kWall);
+        //engine.texture.load(this.kWall);
 
     }
     unload()
     {
-        engine.texture.unload(this.kWall);
+        //engine.texture.unload(this.kWall);
     }
     init() {
 
@@ -30,7 +30,7 @@ class MyGame extends engine.Scene {
             [0, 0, 640, 480]           // viewport (orgX, orgY, width, height)
         );
         this.mCamera.setBackgroundColor([0, 0, 0, 1]);
-        this.mCamera.TempTextureSetter(this.kWall);
+        //this.mCamera.TempTextureSetter(this.kWall);
         this.mGridMap = new engine.GridMap();
         this.mCamera.Raycast(this.mGridMap);
 
