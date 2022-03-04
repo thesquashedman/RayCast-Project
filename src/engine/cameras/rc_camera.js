@@ -14,7 +14,16 @@ class RCCamera extends Camera {
         this.raycastHitPosition = [];
         this.raycastHitDirection = []; //True corresponds to hitting top or bottom wall, false corresponds to hitting left or right wall.
         this.rayAngles = [];
-        this.effect1 = true;
+        this.effect1 = false;
+
+        this.tempTextureHolder = null;
+        this.textureWidth = 200;
+        this.textureHeight = 200;
+        this.fisheye = false;
+    }
+    TempTextureSetter(texture)
+    {
+        this.tempTextureHolder = texture;
     }
     Raycast(GridMap)
     {
@@ -25,6 +34,10 @@ class RCCamera extends Camera {
         for(let i = 0; i < this.resolution; i++)
         {
             let theta = this.raycasterAngle + this.fov/2 - i * (this.fov/(this.resolution - 1));
+            if((this.resolution <= 1))
+            {
+                theta = this.raycasterAngle;
+            }
             this.raycastLengths.push(this._CastRay(theta, GridMap));
             //console.log("length: " + this.raycastLengths[i] + " Angle: " + theta);
 
@@ -166,24 +179,29 @@ class RCCamera extends Camera {
         for (let i = 0; i < this.resolution; i++) {
             let xpos = xStart + (i/this.resolution)*width;
             xpos += 1/(2 * this.resolution) * width; // Moves it over slightly so that it fills the screen.
-            
-            
-            let r = this.raycastLengths[i] * Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
+            let height = this.getWCHeight() / this.raycastLengths[i];
+            if(!this.fisheye)
+            {
+                let r = this.raycastLengths[i] * Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
 
-            //Applies back warping if the angle is greater than 45 degrees, not necissary but effect makes FOVS greater than 90 degrees less vomit inducing
-            if(Math.abs(this.rayAngles[i] - this.raycasterAngle) > Math.PI/4 && this.effect1)
-            {
-                r /= Math.abs(Math.cos(2 * (this.rayAngles[i] - this.raycasterAngle) - Math.PI/2));
+                //Applies back warping if the angle is greater than 45 degrees, not necissary but effect makes FOVS greater than 90 degrees less vomit inducing
+                if(Math.abs(this.rayAngles[i] - this.raycasterAngle) > Math.PI/4 && this.effect1)
+                {
+                    r = this.raycastLengths[i] * Math.abs(Math.sin(this.rayAngles[i] - this.raycasterAngle));
+                    //r /= Math.abs(Math.cos(2 * (this.rayAngles[i] - this.raycasterAngle) - Math.PI/2));
+                }
+                if(r == 0)
+                {
+                    r = 0.000001;
+                }
+                height = this.getWCHeight() / r;
+                
             }
-            if(r == 0)
-            {
-                r = 0.000001;
-            }
-            let height = this.getWCHeight() / r;
             if(height > this.getWCHeight())
-            {
+            {    
                 height = this.getWCHeight();
             }
+            
             
                 
                 
@@ -193,8 +211,10 @@ class RCCamera extends Camera {
             //console.log("line " + i + " xpos: " + xpos + "height: " + height);
 
             let renderable = new engine.Renderable(); // this can be a texture later.
+            //let renderable = new engine.SpriteRenderable(this.tempTextureHolder);
             renderable.getXform().setPosition(xpos, ymiddle);
             renderable.getXform().setSize(width/(this.resolution), height);
+            //renderable.setElementPixelPositions(0, 200, 0, 200);
             if(this.raycastHitDirection[i])
             {
                 renderable.setColor([0.4,0.1,0.1,1]);
@@ -226,6 +246,23 @@ class RCCamera extends Camera {
         
     }
 
+    setFOV(fov)
+    {
+        this.fov = fov;
+    }
+    getFOV()
+    {
+        return this.fov;
+    }
+    setResolution(resolution)
+    {
+        this.resolution = resolution;
+    }
+    getResolution()
+    {
+        return this.resolution;
+    }
+
     setRayCasterAngle(t) {
         this.raycasterAngle = t;
     }
@@ -246,9 +283,21 @@ class RCCamera extends Camera {
     getRayCasterAngle() {
         return this.raycasterAngle;
     }
+    getEffect1()
+    {
+        return this.effect1;
+    }
     enableEffect1()
     {
         this.effect1 = !this.effect1;
+    }
+    getFishEye()
+    {
+        return this.fisheye;
+    }
+    toggleFishEye()
+    {
+        this.fisheye = !this.fisheye;
     }
 
 }

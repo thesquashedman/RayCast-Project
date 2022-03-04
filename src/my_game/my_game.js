@@ -6,21 +6,31 @@ class MyGame extends engine.Scene {
     constructor() {
         super();
 
-        
+        this.kWall = "/assets/wall_texture.png";
         // The camera to view the scene
         this.mCamera = null;
         this.mGridMap = null;
+        this.mMsg = null;
 
     }
-        
+    load(){
+
+        engine.texture.load(this.kWall);
+
+    }
+    unload()
+    {
+        engine.texture.unload(this.kWall);
+    }
     init() {
 
         this.mCamera = new engine.RCCamera(
-            vec2.fromValues(50, 27.5), // position of the camera
+            vec2.fromValues(50, 37.5), // position of the camera
             100,                       // width of camera
             [0, 0, 640, 480]           // viewport (orgX, orgY, width, height)
         );
         this.mCamera.setBackgroundColor([0, 0, 0, 1]);
+        this.mCamera.TempTextureSetter(this.kWall);
         this.mGridMap = new engine.GridMap();
         this.mCamera.Raycast(this.mGridMap);
 
@@ -50,14 +60,20 @@ class MyGame extends engine.Scene {
         this.mMapCharRenderable.setColor([1,0,0,1]);
         this.mMapCharLineR = new engine.LineRenderable();
 
+        this.mMsg = new engine.FontRenderable("Status");
+        this.mMsg.setColor([1, 1, 1, 1]);
+        this.mMsg.getXform().setPosition(2, 2);
+        this.mMsg.setTextHeight(2);
+
 
     }
     
     draw() {
-
+        this.mCamera.Raycast(this.mGridMap);
         //engine.clearCanvas([0.7, 0.9, 0.9, 1.0]); // clear to light gray
         this.mCamera.setViewAndCameraMatrix();
         this.mCamera.DrawRays();
+        this.mMsg.draw(this.mCamera);
         
 
         this.mMapCam.setViewAndCameraMatrix();
@@ -72,7 +88,8 @@ class MyGame extends engine.Scene {
     }
     
     update () {
-        this.mCamera.Raycast(this.mGridMap);
+        
+        
         
         if (engine.input.isKeyPressed(engine.input.keys.A)) {
             this.mCamera.moveRayCasterAngle(0.03);
@@ -91,6 +108,29 @@ class MyGame extends engine.Scene {
         {
             this.mCamera.enableEffect1();
         }
+        if(engine.input.isKeyClicked(engine.input.keys.F))
+        {
+            this.mCamera.toggleFishEye();
+        }
+        if(engine.input.isKeyPressed(engine.input.keys.K))
+        {
+            this.mCamera.setFOV(this.mCamera.getFOV() - 0.03);
+        }
+        if(engine.input.isKeyPressed(engine.input.keys.L))
+        {
+            this.mCamera.setFOV(this.mCamera.getFOV() + 0.03);
+        }
+        if(engine.input.isKeyPressed(engine.input.keys.N))
+        {
+            this.mCamera.setResolution(this.mCamera.getResolution() -0.5);
+        }
+        if(engine.input.isKeyPressed(engine.input.keys.M))
+        {
+            this.mCamera.setResolution(this.mCamera.getResolution() + 0.5);
+        }
+        
+
+
         if(this.mCamera.mouseWCX() > 60)
         {
             let r = (this.mCamera.mouseWCX() - 60) / 40
@@ -101,7 +141,7 @@ class MyGame extends engine.Scene {
             let r = this.mCamera.mouseWCX() / 40
             this.mCamera.moveRayCasterAngle(0.06 * (1 -r));
         }
-
+        
 
         let pos = this.mCamera.getRayCasterPos();
         let ang = this.mCamera.getRayCasterAngle();
@@ -109,6 +149,8 @@ class MyGame extends engine.Scene {
         this.mMapCharRenderable.getXform().setPosition(pos[0], pos[1]);
         this.mMapCharLineR.setFirstVertex(pos[0], pos[1]);
         this.mMapCharLineR.setSecondVertex(pos[0]+dist*Math.cos(ang), pos[1]+dist*Math.sin(ang));
+
+        this.mMsg.setText("Resolution: " + this.mCamera.getResolution().toFixed(0) + ", FOV:" + this.mCamera.getFOV().toFixed(4) + ", Fisheye: " + this.mCamera.getFishEye() + ", Effect1: " + this.mCamera.getEffect1());
     }
 }
 
