@@ -17,8 +17,8 @@ class RCCamera extends Camera {
         this.effect1 = false;
 
         this.tempTextureHolder = null;
-        this.textureWidth = 200;
-        this.textureHeight = 200;
+        this.textureWidth = 32;
+        this.textureHeight = 32;
         this.fisheye = false;
     }
     TempTextureSetter(texture)
@@ -210,17 +210,35 @@ class RCCamera extends Camera {
             let yEnd = ymiddle - height/2;
             //console.log("line " + i + " xpos: " + xpos + "height: " + height);
 
-            let renderable = new engine.Renderable(); // this can be a texture later.
-            //let renderable = new engine.SpriteRenderable(this.tempTextureHolder);
+            //let renderable = new engine.Renderable(); // this can be a texture later.
+            let renderable = new engine.SpriteRenderable(this.tempTextureHolder);
             renderable.getXform().setPosition(xpos, ymiddle);
             renderable.getXform().setSize(width/(this.resolution), height);
-            //renderable.setElementPixelPositions(0, 200, 0, 200);
+            //let pixelStart = 0;
+            let pixelWidth = this.textureWidth / this.resolution;
+            let temp = 0
+            if(!this.raycastHitDirection[i])
+            {
+                temp = 1;
+                
+            }
+            let x = this.raycastHitPosition[i][temp] / 5;
+            x = x - Math.floor(x);
+            x = x * this.textureWidth;
+            if(x + pixelWidth > this.textureWidth)
+            {
+                x = this.textureWidth - this.pixelWidth;
+            }
+            renderable.setElementPixelPositions(x, x + pixelWidth, 0, this.textureHeight);
+
             if(this.raycastHitDirection[i])
             {
-                renderable.setColor([0.4,0.1,0.1,1]);
+                //renderable.setColor([0.4,0.1,0.1,1]);
+                renderable.setColor([0,0,0,.4]);
             }
             else{
-                renderable.setColor([0.6,0.2,0.2,1]);
+                //renderable.setColor([0.6,0.2,0.2,1]);
+                renderable.setColor([1,1,1,0]);
             }
             
             
