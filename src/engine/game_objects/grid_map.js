@@ -10,7 +10,7 @@ class GridMap{
             [true, true, true, null, true]
         ];
         this.mPos = [0, 0];
-        this.mWidth = 25;
+        this.mWidth = 15.5;
         this.mHeight = 25;
 
     }
