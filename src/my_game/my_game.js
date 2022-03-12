@@ -50,8 +50,8 @@ class MyGame extends engine.Scene {
 
         this.mGridMap2DRenderables = [];
 
-        let height = this.mGridMap.getHeight()/this.mGridMap.getHeightOfTile();
-        let width = this.mGridMap.getWidth()/this.mGridMap.getWidthOfTile();
+        let height = this.mGridMap.getHeightInTiles();
+        let width = this.mGridMap.getWidthInTiles();
         let offsetX = this.mGridMap.getWidthOfTile()/2;
         let offsetY = this.mGridMap.getHeightOfTile()/2;
         for (let i = 0; i < width; i++) {
@@ -60,7 +60,7 @@ class MyGame extends engine.Scene {
                     continue;
                 }
                 let renderable = new engine.Renderable();
-                renderable.getXform().setPosition(this.mGridMap.getWidthOfTile()*i + offsetX + this.mGridMap.getPosition()[1], this.mGridMap.getHeightOfTile()*j  + offsetY + this.mGridMap.getPosition()[1]);
+                renderable.getXform().setPosition(this.mGridMap.getWidthOfTile()*i + offsetX + this.mGridMap.getPosition()[0], this.mGridMap.getHeightOfTile()*j  + offsetY + this.mGridMap.getPosition()[1]);
                 renderable.getXform().setSize(this.mGridMap.getWidthOfTile(), this.mGridMap.getHeightOfTile());
                 this.mGridMap2DRenderables.push(renderable);
             }
@@ -162,6 +162,7 @@ class MyGame extends engine.Scene {
         }
 
 
+        /*
         if(this.mCamera.mouseWCX() > 60)
         {
             let r = (this.mCamera.mouseWCX() - 60) / 40
@@ -172,6 +173,7 @@ class MyGame extends engine.Scene {
             let r = this.mCamera.mouseWCX() / 40
             this.mCamera.moveRayCasterAngle(0.06 * (1 -r));
         }
+        */
         
 
         let pos = this.mCamera.getRayCasterPos();

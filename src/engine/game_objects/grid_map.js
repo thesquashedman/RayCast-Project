@@ -9,7 +9,7 @@ class GridMap{
             [true, null, null, null, true],
             [true, true, true, null, true]
         ];
-        this.mPos = [0, 0];
+        this.mPos = [3, 7];
         this.mWidth = 15.5;
         this.mHeight = 25;
 
@@ -54,6 +54,14 @@ class GridMap{
     {
         return this.mWidth / this.mTiles[0].length;
         return 5;
+    }
+    getHeightInTiles()
+    {
+        return this.mTiles.length;
+    }
+    getWidthInTiles()
+    {
+        return this.mTiles.length;
     }
     getTileAtIndex(x, y)
     {

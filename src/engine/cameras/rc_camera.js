@@ -23,6 +23,7 @@ class RCCamera extends Camera {
         this.textureHeight = 32;
         this.fisheye = false;
         this.horizonLine = 0;
+        this.tempGridPos = [];
     }
     TempTextureSetter(texture)
     {
@@ -57,6 +58,7 @@ class RCCamera extends Camera {
     _CastRay(theta, GridMap)
     {
         this.rayAngles.push(theta);
+        this.tempGridPos = GridMap.getPosition();
         let positionInGrid = [this.raycasterPosition[0] - GridMap.getPosition()[0], this.raycasterPosition[1] - GridMap.getPosition()[1]];
         let numberOfTime = 0;
         let currentDistance = 0;
@@ -353,7 +355,7 @@ class RCCamera extends Camera {
             lineRay.setColor([0,1,0,1]);
             lineRay.setFirstVertex(this.raycasterPosition[0], this.raycasterPosition[1]);
             //Currently, raycast hit position is within the grid coordinates (center is at grid bottom left) and not in real world coordinates
-            lineRay.setSecondVertex(this.raycastHitPosition[i][0], this.raycastHitPosition[i][1]);
+            lineRay.setSecondVertex(this.raycastHitPosition[i][0] + this.tempGridPos[0], this.raycastHitPosition[i][1] + this.tempGridPos[1]);
             
             lineRay.draw(secondCamera);
             
