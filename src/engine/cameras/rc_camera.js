@@ -53,12 +53,17 @@ class RCCamera extends Camera {
         }
         
     }
+    //Complete mess, don't even try to make sense of it, just straight up contact me if you something from it.
     _CastRay(theta, GridMap)
     {
         this.rayAngles.push(theta);
         let positionInGrid = [this.raycasterPosition[0] - GridMap.getPosition()[0], this.raycasterPosition[1] - GridMap.getPosition()[1]];
         let numberOfTime = 0;
         let currentDistance = 0;
+        let perfectY = false;
+        let perfectX = false;
+        let perfectXIndex = 0;
+        let perfectYIndex = 0;
         //Checks whether the current position it's checking for the raycast is within the GridMap
         while (
             positionInGrid[0] > 0
@@ -70,6 +75,67 @@ class RCCamera extends Camera {
             //Calculates the next vertical and horizontal walls
             let nextY = Math.floor(positionInGrid[1] / GridMap.getHeightOfTile());
             let nextX = Math.floor(positionInGrid[0] / GridMap.getWidthOfTile());
+            
+            if(Math.sin(theta) >= 0)
+            {
+                if(perfectY)
+                {
+                    nextY = perfectYIndex;
+                }
+                
+                nextY = (nextY + 1);
+                perfectYIndex = nextY;
+                nextY *= GridMap.getHeightOfTile();
+                
+                
+            } 
+            else if (Math.sin(theta) < 0)
+            {
+                if(perfectY)
+                {
+                    nextY = (perfectYIndex - 1);
+                }
+                
+                perfectYIndex = nextY;
+                nextY *= GridMap.getHeightOfTile();
+                
+                
+            }
+            else
+            {
+                //Should never get here
+                nextY = null;
+            }
+            
+            if(Math.cos(theta) >= 0)
+            {
+                if(perfectX)
+                {
+                    nextX = perfectXIndex;
+                }
+                nextX = (nextX + 1);
+                perfectXIndex = nextX;
+                nextX *= GridMap.getWidthOfTile();
+            } 
+            else if (Math.cos(theta) < 0)
+            {
+                if(perfectX)
+                {
+                    nextX = (perfectXIndex - 1);
+                }
+                
+                perfectXIndex = nextX;
+                nextX *= GridMap.getWidthOfTile();
+                
+                
+            }
+            else
+            {
+                //Should never get here
+                nextX = null;
+            }
+            
+            /*
             if(Math.sin(theta) >= 0)
             {
                 nextY = (nextY + 1) * GridMap.getHeightOfTile();
@@ -113,6 +179,9 @@ class RCCamera extends Camera {
                 //Should never get here
                 nextX = null;
             }
+            
+           
+            */
             let yOfX = positionInGrid[1] + ((nextX - positionInGrid[0]) * Math.tan(theta));
             let xOfY = positionInGrid[0] + ((nextY - positionInGrid[1]) / Math.tan(theta));
 
@@ -120,8 +189,9 @@ class RCCamera extends Camera {
             let yDistance = Math.sqrt(Math.pow(positionInGrid[1] - nextY, 2) + Math.pow(positionInGrid[0] - xOfY, 2));
 
             if (yDistance <= xDistance)
-            {
-                let yIndex = Math.floor(nextY / GridMap.getHeightOfTile());
+            {   
+                //let yIndex = Math.floor(nextY / GridMap.getHeightOfTile());
+                let yIndex = perfectYIndex;
                 let xIndex = Math.floor(xOfY / GridMap.getWidthOfTile());
                 currentDistance += yDistance;
                 positionInGrid = [xOfY, nextY];
@@ -140,12 +210,15 @@ class RCCamera extends Camera {
                         return currentDistance;
                     }
                 }
+                perfectX = false;
+                perfectY = true;
                 
                 
             }
             else
             {
-                let xIndex = Math.floor(nextX / GridMap.getWidthOfTile());
+                //let xIndex = Math.floor(nextX / GridMap.getWidthOfTile());
+                let xIndex = perfectXIndex;
                 let yIndex = Math.floor(yOfX / GridMap.getHeightOfTile());
                 currentDistance += xDistance;
                 positionInGrid = [nextX, yOfX];
@@ -153,6 +226,7 @@ class RCCamera extends Camera {
                 {
                     xIndex -= 1;
                 }
+                
                 if(xIndex >= 0  && xIndex < GridMap.getWidth() / GridMap.getWidthOfTile())
                 {
                     if(GridMap.getTileAtIndex(xIndex, yIndex) != null)
@@ -163,6 +237,8 @@ class RCCamera extends Camera {
                         return currentDistance;
                     }
                 }
+                perfectX = true;
+                perfectY = false;
                 
             }
             
