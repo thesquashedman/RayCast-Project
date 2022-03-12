@@ -13,7 +13,7 @@ class MyGame extends engine.Scene {
         this.mCamera = null;
         this.mGridMap = null;
         this.mMsg = null;
-
+        
     }
     load(){
 
@@ -52,14 +52,15 @@ class MyGame extends engine.Scene {
 
         let height = this.mGridMap.getHeight()/this.mGridMap.getHeightOfTile();
         let width = this.mGridMap.getWidth()/this.mGridMap.getWidthOfTile();
-        let offset = this.mGridMap.getWidthOfTile()/2;
+        let offsetX = this.mGridMap.getWidthOfTile()/2;
+        let offsetY = this.mGridMap.getHeightOfTile()/2;
         for (let i = 0; i < width; i++) {
             for (let j = 0; j < height; j++) {
-                if (!this.mGridMap.getTileAtIndex(i, j)) {
+                if (this.mGridMap.getTileAtIndex(i, j) == null) {
                     continue;
                 }
                 let renderable = new engine.Renderable();
-                renderable.getXform().setPosition(this.mGridMap.getWidthOfTile()*i+offset, this.mGridMap.getHeightOfTile()*j+offset);
+                renderable.getXform().setPosition(this.mGridMap.getWidthOfTile()*i + offsetX + this.mGridMap.getPosition()[1], this.mGridMap.getHeightOfTile()*j  + offsetY + this.mGridMap.getPosition()[1]);
                 renderable.getXform().setSize(this.mGridMap.getWidthOfTile(), this.mGridMap.getHeightOfTile());
                 this.mGridMap2DRenderables.push(renderable);
             }

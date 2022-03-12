@@ -1,3 +1,5 @@
+"use strict";
+
 import engine from "../index.js";
 import Camera from "./camera.js";
 
@@ -119,7 +121,7 @@ class RCCamera extends Camera {
 
             if (yDistance <= xDistance)
             {
-                let yIndex = nextY / GridMap.getHeightOfTile();
+                let yIndex = Math.floor(nextY / GridMap.getHeightOfTile());
                 let xIndex = Math.floor(xOfY / GridMap.getWidthOfTile());
                 currentDistance += yDistance;
                 positionInGrid = [xOfY, nextY];
@@ -130,7 +132,7 @@ class RCCamera extends Camera {
                 }
                 if(yIndex >= 0 && yIndex < GridMap.getHeight() / GridMap.getHeightOfTile())
                 {
-                    if(GridMap.getTileAtIndex(xIndex, yIndex))
+                    if(GridMap.getTileAtIndex(xIndex, yIndex) != null)
                     {
                         //console.log(positionInGrid[0] + " " + positionInGrid[1]);
                         this.raycastHitPosition.push(positionInGrid);
@@ -143,7 +145,7 @@ class RCCamera extends Camera {
             }
             else
             {
-                let xIndex = nextX / GridMap.getWidthOfTile();
+                let xIndex = Math.floor(nextX / GridMap.getWidthOfTile());
                 let yIndex = Math.floor(yOfX / GridMap.getHeightOfTile());
                 currentDistance += xDistance;
                 positionInGrid = [nextX, yOfX];
@@ -153,7 +155,7 @@ class RCCamera extends Camera {
                 }
                 if(xIndex >= 0  && xIndex < GridMap.getWidth() / GridMap.getWidthOfTile())
                 {
-                    if(GridMap.getTileAtIndex(xIndex, yIndex))
+                    if(GridMap.getTileAtIndex(xIndex, yIndex) != null)
                     {
                         //console.log(positionInGrid[0] + " " + positionInGrid[1]);
                         this.raycastHitPosition.push(positionInGrid);
@@ -163,18 +165,21 @@ class RCCamera extends Camera {
                 }
                 
             }
+            
             numberOfTime++;
             if(numberOfTime >250)
             {
-                this.raycastHitPosition.push([null, null]);
+                console.log("Stuck in loop " + positionInGrid[0] + " " + positionInGrid[1] + " " + (theta / Math.PI) * 180 + " " + this.raycasterPosition[0] + " " + this.raycastHitPosition);
+                this.raycastHitPosition.push(positionInGrid);
                 this.raycastHitDirection.push(null);
                 return -15;
             }
+            
 
 
         }
         //If it gets outside the GridMap, return -1 to show that it didn't hit
-        this.raycastHitPosition.push([null, null]);
+        this.raycastHitPosition.push(positionInGrid);
         this.raycastHitDirection.push(null);
         return -1;
     }
@@ -184,77 +189,80 @@ class RCCamera extends Camera {
         let ymiddle = this.getWCCenter()[1];
         let width = this.getWCWidth();
         for (let i = 0; i < this.resolution; i++) {
-            let xpos = xStart + (i/this.resolution)*width;
-            xpos += 1/(2 * this.resolution) * width; // Moves it over slightly so that it fills the screen.
-            let height = this.getWCHeight() / this.raycastLengths[i];
-            if(!this.fisheye)
+            if(this.raycastLengths[i] >= 0)
             {
-                let r = this.raycastLengths[i] * Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
-
-                //Applies back warping if the angle is greater than 45 degrees, not necissary but effect makes FOVS greater than 90 degrees less vomit inducing
-                if(Math.abs(this.rayAngles[i] - this.raycasterAngle) > Math.PI/4 && this.effect1)
+                let xpos = xStart + (i/this.resolution)*width;
+                xpos += 1/(2 * this.resolution) * width; // Moves it over slightly so that it fills the screen.
+                let height = this.getWCHeight() / this.raycastLengths[i];
+                if(!this.fisheye)
                 {
-                    r = this.raycastLengths[i] * Math.abs(Math.sin(this.rayAngles[i] - this.raycasterAngle));
-                    //r /= Math.abs(Math.cos(2 * (this.rayAngles[i] - this.raycasterAngle) - Math.PI/2));
+                    let r = this.raycastLengths[i] * Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
+
+                    //Applies back warping if the angle is greater than 45 degrees, not necissary but effect makes FOVS greater than 90 degrees less vomit inducing
+                    if(Math.abs(this.rayAngles[i] - this.raycasterAngle) > Math.PI/4 && this.effect1)
+                    {
+                        r = this.raycastLengths[i] * Math.abs(Math.sin(this.rayAngles[i] - this.raycasterAngle));
+                        //r /= Math.abs(Math.cos(2 * (this.rayAngles[i] - this.raycasterAngle) - Math.PI/2));
+                    }
+                    if(r == 0)
+                    {
+                        r = 0.000001;
+                    }
+                    height = this.getWCHeight() / r;
+                    
                 }
-                if(r == 0)
+                if(height > this.getWCHeight())
+                {    
+                    height = this.getWCHeight();
+                }
+                
+                
+                    
+                    
+                
+                let yStart = ymiddle + height/2;
+                let yEnd = ymiddle - height/2;
+                //console.log("line " + i + " xpos: " + xpos + "height: " + height);
+
+                //let renderable = new engine.Renderable(); // this can be a texture later.
+                let renderable = new engine.SpriteRenderable(this.tempTextureHolder);
+                renderable.getXform().setPosition(xpos, ymiddle  + this.horizonLine);
+                renderable.getXform().setSize(width/(this.resolution), height);
+                //let pixelStart = 0;
+                let pixelWidth = this.textureWidth / this.resolution;
+                let temp = 0
+                if(!this.raycastHitDirection[i])
                 {
-                    r = 0.000001;
+                    temp = 1;
+                    
                 }
-                height = this.getWCHeight() / r;
-                
-            }
-            if(height > this.getWCHeight())
-            {    
-                height = this.getWCHeight();
-            }
-            
-            
-                
-                
-            
-            let yStart = ymiddle + height/2;
-            let yEnd = ymiddle - height/2;
-            //console.log("line " + i + " xpos: " + xpos + "height: " + height);
+                let x = this.raycastHitPosition[i][temp] / 5;
+                x = x - Math.floor(x);
+                x = x * this.textureWidth;
+                /*
+                if(x + pixelWidth >= this.textureWidth)
+                {
+                    x = this.textureWidth - this.pixelWidth;
+                }
+                */
+                renderable.setElementPixelPositions(x, x + pixelWidth, 0, this.textureHeight);
 
-            //let renderable = new engine.Renderable(); // this can be a texture later.
-            let renderable = new engine.SpriteRenderable(this.tempTextureHolder);
-            renderable.getXform().setPosition(xpos, ymiddle  + this.horizonLine);
-            renderable.getXform().setSize(width/(this.resolution), height);
-            //let pixelStart = 0;
-            let pixelWidth = this.textureWidth / this.resolution;
-            let temp = 0
-            if(!this.raycastHitDirection[i])
-            {
-                temp = 1;
+                if(this.raycastHitDirection[i])
+                {
+                    //renderable.setColor([0.4,0.1,0.1,1]);
+                    renderable.setColor([0,0,0,.4]);
+                }
+                else{
+                    //renderable.setColor([0.6,0.2,0.2,1]);
+                    renderable.setColor([1,1,1,0]);
+                }
+                
+                
+                
+                renderable.draw(this);
+                
                 
             }
-            let x = this.raycastHitPosition[i][temp] / 5;
-            x = x - Math.floor(x);
-            x = x * this.textureWidth;
-            /*
-            if(x + pixelWidth >= this.textureWidth)
-            {
-                x = this.textureWidth - this.pixelWidth;
-            }
-            */
-            renderable.setElementPixelPositions(x, x + pixelWidth, 0, this.textureHeight);
-
-            if(this.raycastHitDirection[i])
-            {
-                //renderable.setColor([0.4,0.1,0.1,1]);
-                renderable.setColor([0,0,0,.4]);
-            }
-            else{
-                //renderable.setColor([0.6,0.2,0.2,1]);
-                renderable.setColor([1,1,1,0]);
-            }
-            
-            
-            
-            renderable.draw(this);
-            
-            
         }
 
     }
@@ -262,13 +270,17 @@ class RCCamera extends Camera {
     {
 
         //secondCamera.setViewAndCameraMatrix();
+        
         for (let i = 0; i < this.resolution; i++) {
+            
             let lineRay = new engine.LineRenderable();
             lineRay.setColor([0,1,0,1]);
             lineRay.setFirstVertex(this.raycasterPosition[0], this.raycasterPosition[1]);
+            //Currently, raycast hit position is within the grid coordinates (center is at grid bottom left) and not in real world coordinates
             lineRay.setSecondVertex(this.raycastHitPosition[i][0], this.raycastHitPosition[i][1]);
             
             lineRay.draw(secondCamera);
+            
         }
         
     }
