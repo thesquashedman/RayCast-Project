@@ -9,14 +9,14 @@ class GridMap{
             [true, null, null, null, true],
             [true, true, true, null, true]
         ];
-        this.mPos = [3, 7];
-        this.mWidth = 15.5;
-        this.mHeight = 25;
+        this.mPos = [3, 5];
+        this.mWidth = 18;
+        this.mHeight = 25.5;
 
     }
     setTiles(TileArray)
     {
-        Tiles = TileArray;
+        this.mTiles = TileArray;
     }
     setPosition(pos)
     {
@@ -33,27 +33,27 @@ class GridMap{
     getPosition()
     {
         return this.mPos;
-        return [0, 0];
+        
     }
     getWidth()
     {
         return this.mWidth;
-        return 25;
+        
     }
     getHeight()
     {
         return this.mHeight;
-        return 25;
+        
     }
     getHeightOfTile()
     {
         return this.mHeight / this.mTiles.length;
-        return 5;
+        
     }
     getWidthOfTile()
     {
         return this.mWidth / this.mTiles[0].length;
-        return 5;
+        
     }
     getHeightInTiles()
     {
@@ -61,18 +61,11 @@ class GridMap{
     }
     getWidthInTiles()
     {
-        return this.mTiles.length;
+        return this.mTiles[0].length;
     }
     getTileAtIndex(x, y)
     {
-        let Tiles = [
-            [true, true, true, true, true],
-            [true, true, null, true, true],
-            [true, true, null, null, true],
-            [true, null, null, null, true],
-            [true, true, true, null, true]
-        ];
-        return Tiles[(Tiles.length - 1) - y][x];
+        return this.mTiles[(this.mTiles.length - 1) - y][x];
     }
 }
 export default GridMap;

@@ -16,6 +16,8 @@ class RCCamera extends Camera {
         this.raycastHitPosition = [];
         this.raycastHitDirection = []; //True corresponds to hitting top or bottom wall, false corresponds to hitting left or right wall.
         this.rayAngles = [];
+        this.raycastWallsHit = [];
+        this.raycastWallsUVPixels = [];
         this.effect1 = false;
 
         this.tempTextureHolder = null;
@@ -23,7 +25,8 @@ class RCCamera extends Camera {
         this.textureHeight = 32;
         this.fisheye = false;
         this.horizonLine = 0;
-        this.tempGridPos = [];
+        this.tempWallHeight = 1;
+        this.wallShadows = true;
     }
     TempTextureSetter(texture)
     {
@@ -41,6 +44,8 @@ class RCCamera extends Camera {
         this.raycastHitPosition = [];
         this.raycastHitDirection = [];
         this.rayAngles = [];
+        this.raycastWallsHit = [];
+        this.raycastWallsUVPixels = [];
         for(let i = 0; i < this.resolution; i++)
         {
             let theta = this.raycasterAngle + this.fov/2 - i * (this.fov/(this.resolution - 1));
@@ -58,7 +63,6 @@ class RCCamera extends Camera {
     _CastRay(theta, GridMap)
     {
         this.rayAngles.push(theta);
-        this.tempGridPos = GridMap.getPosition();
         let positionInGrid = [this.raycasterPosition[0] - GridMap.getPosition()[0], this.raycasterPosition[1] - GridMap.getPosition()[1]];
         let numberOfTime = 0;
         let currentDistance = 0;
@@ -137,53 +141,6 @@ class RCCamera extends Camera {
                 nextX = null;
             }
             
-            /*
-            if(Math.sin(theta) >= 0)
-            {
-                nextY = (nextY + 1) * GridMap.getHeightOfTile();
-            } 
-            else if (Math.sin(theta) < 0)
-            {
-                if(positionInGrid[1] % GridMap.getHeightOfTile() == 0)
-                {
-                    nextY = (nextY - 1) * GridMap.getHeightOfTile();
-                }
-                else
-                {
-                    nextY = nextY * GridMap.getHeightOfTile();
-                }
-                
-            }
-            else
-            {
-                //Should never get here
-                nextY = null;
-            }
-            
-            if(Math.cos(theta) >= 0)
-            {
-                nextX = (nextX + 1) * GridMap.getWidthOfTile();
-            } 
-            else if (Math.cos(theta) < 0)
-            {
-                if(positionInGrid[0] % GridMap.getWidthOfTile() == 0)
-                {
-                    nextX = (nextX - 1) * GridMap.getWidthOfTile();
-                }
-                else
-                {
-                    nextX = nextX * GridMap.getWidthOfTile();
-                }
-                
-            }
-            else
-            {
-                //Should never get here
-                nextX = null;
-            }
-            
-           
-            */
             let yOfX = positionInGrid[1] + ((nextX - positionInGrid[0]) * Math.tan(theta));
             let xOfY = positionInGrid[0] + ((nextY - positionInGrid[1]) / Math.tan(theta));
 
@@ -204,11 +161,53 @@ class RCCamera extends Camera {
                 }
                 if(yIndex >= 0 && yIndex < GridMap.getHeight() / GridMap.getHeightOfTile())
                 {
-                    if(GridMap.getTileAtIndex(xIndex, yIndex) != null)
+                    let tile = GridMap.getTileAtIndex(xIndex, yIndex);
+                    if(tile != null)
                     {
                         //console.log(positionInGrid[0] + " " + positionInGrid[1]);
-                        this.raycastHitPosition.push(positionInGrid);
+                        this.raycastHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
                         this.raycastHitDirection.push(true);
+                        let texture = null;
+                        let up = null;
+                        if(Math.sin(theta) < 0)
+                        {
+                            texture = tile.getTopTexture();
+                            this.raycastWallsHit.push(texture[0]);
+                            up = false;
+                        }
+                        else
+                        {
+                            texture = tile.getBottomTexture();
+                            this.raycastWallsHit.push(texture[0]);
+                            up = true;
+                        }
+                        let pixelWidth = (texture[2] - texture[1])/this.resolution;
+                        let x = xOfY / GridMap.getWidthOfTile();
+                        x = x - Math.floor(x);
+                        x *= (texture[2] - texture[1]);
+                        if(x + pixelWidth >= texture[2] - texture[1])
+                        {
+                            if(up)
+                            {
+                                this.raycastWallsUVPixels.push([x + texture[1], texture[2], texture[3], texture[4]]);
+                            }
+                            else{
+                                this.raycastWallsUVPixels.push([(texture[2] - x) + texture[1], texture[1], texture[3], texture[4]]);
+                            }
+                            
+                        }
+                        else{
+                            //this.raycastWallsUVPixels.push([x + texture[1], texture[2], texture[3], texture[4]]);
+                            if(up)
+                            {
+                                this.raycastWallsUVPixels.push([x + texture[1], x + texture[1] + pixelWidth, texture[3], texture[4]]);
+                            }
+                            else{
+                                this.raycastWallsUVPixels.push([(texture[2] - x) + texture[1], (texture[2] - x) + texture[1] - pixelWidth, texture[3], texture[4]]);
+                            }
+                            
+                        }
+                        //this.raycastWallsUVPixels.push([null, null, null, null]);
                         return currentDistance;
                     }
                 }
@@ -231,11 +230,54 @@ class RCCamera extends Camera {
                 
                 if(xIndex >= 0  && xIndex < GridMap.getWidth() / GridMap.getWidthOfTile())
                 {
-                    if(GridMap.getTileAtIndex(xIndex, yIndex) != null)
+                    let tile = GridMap.getTileAtIndex(xIndex, yIndex);
+                    if(tile != null)
                     {
                         //console.log(positionInGrid[0] + " " + positionInGrid[1]);
-                        this.raycastHitPosition.push(positionInGrid);
+                        this.raycastHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
                         this.raycastHitDirection.push(false);
+
+                        let texture = null;
+                        let left = null;
+                        if(Math.cos(theta) < 0)
+                        {
+                            texture = tile.getRightTexture();
+                            this.raycastWallsHit.push(texture[0]);
+                            left = true;
+                        }
+                        else
+                        {
+                            texture = tile.getLeftTexture();
+                            this.raycastWallsHit.push(texture[0]);
+                            left = false;
+                        }
+                        let pixelWidth = (texture[2] - texture[1])/this.resolution;
+                        let x = yOfX / GridMap.getHeightOfTile();
+                        x = x - Math.floor(x);
+                        x *= (texture[2] - texture[1]);
+                        if(x + pixelWidth >= texture[2] - texture[1])
+                        {
+                            if(left)
+                            {
+                                this.raycastWallsUVPixels.push([x + texture[1], texture[2], texture[3], texture[4]]);
+                            }
+                            else{
+                                this.raycastWallsUVPixels.push([(texture[2] - x) + texture[1], texture[1], texture[3], texture[4]]);
+                            }
+                            
+                        }
+                        else{
+                            //this.raycastWallsUVPixels.push([x + texture[1], texture[2], texture[3], texture[4]]);
+                            if(left)
+                            {
+                                this.raycastWallsUVPixels.push([x + texture[1], x + texture[1] + pixelWidth, texture[3], texture[4]]);
+                            }
+                            else{
+                                this.raycastWallsUVPixels.push([(texture[2] - x) + texture[1], (texture[2] - x) + texture[1] - pixelWidth, texture[3], texture[4]]);
+                            }
+                            
+                        }
+                        
                         return currentDistance;
                     }
                 }
@@ -248,8 +290,10 @@ class RCCamera extends Camera {
             if(numberOfTime >250)
             {
                 console.log("Stuck in loop " + positionInGrid[0] + " " + positionInGrid[1] + " " + (theta / Math.PI) * 180 + " " + this.raycasterPosition[0] + " " + this.raycastHitPosition);
-                this.raycastHitPosition.push(positionInGrid);
+                this.raycastHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
                 this.raycastHitDirection.push(null);
+                this.raycastWallsHit.push(null);
+                this.raycastWallsUVPixels.push([null, null, null, null]);
                 return -15;
             }
             
@@ -257,8 +301,10 @@ class RCCamera extends Camera {
 
         }
         //If it gets outside the GridMap, return -1 to show that it didn't hit
-        this.raycastHitPosition.push(positionInGrid);
+        this.raycastHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
         this.raycastHitDirection.push(null);
+        this.raycastWallsHit.push(null);
+        this.raycastWallsUVPixels.push([null, null, null, null]);
         return -1;
     }
 
@@ -303,37 +349,68 @@ class RCCamera extends Camera {
                 //console.log("line " + i + " xpos: " + xpos + "height: " + height);
 
                 //let renderable = new engine.Renderable(); // this can be a texture later.
-                let renderable = new engine.SpriteRenderable(this.tempTextureHolder);
+                let renderable = null;
+                renderable = new engine.SpriteRenderable(this.raycastWallsHit[i]);
                 renderable.getXform().setPosition(xpos, ymiddle  + this.horizonLine);
                 renderable.getXform().setSize(width/(this.resolution), height);
-                //let pixelStart = 0;
-                let pixelWidth = this.textureWidth / this.resolution;
-                let temp = 0
+                //console.log(this.raycastWallsUVPixels[i][0] + " " + this.raycastWallsUVPixels[i][1] + " " + this.raycastWallsUVPixels[i][2] + " " + this.raycastWallsUVPixels[i][3]);
+                renderable.setElementPixelPositions(this.raycastWallsUVPixels[i][0], this.raycastWallsUVPixels[i][1], this.raycastWallsUVPixels[i][2], this.raycastWallsUVPixels[i][3]);
+                /*
                 if(!this.raycastHitDirection[i])
                 {
-                    temp = 1;
+                    renderable = new engine.SpriteRenderable(this.raycastWallsHit[i]);
+                    renderable.getXform().setPosition(xpos, ymiddle  + this.horizonLine);
+                    renderable.getXform().setSize(width/(this.resolution), height);
+                    //console.log(this.raycastWallsUVPixels[i][0] + " " + this.raycastWallsUVPixels[i][1] + " " + this.raycastWallsUVPixels[i][2] + " " + this.raycastWallsUVPixels[i][3]);
+                    renderable.setElementPixelPositions(this.raycastWallsUVPixels[i][0], this.raycastWallsUVPixels[i][1], this.raycastWallsUVPixels[i][2], this.raycastWallsUVPixels[i][3]);
+                }
+                else
+                {
+                    renderable = new engine.SpriteRenderable(this.tempTextureHolder);
+                    renderable.getXform().setPosition(xpos, ymiddle  + this.horizonLine);
+                    renderable.getXform().setSize(width/(this.resolution), height);
+
+                    let pixelWidth = this.textureWidth / (this.resolution);
+                    let temp = 0
+                    if(!this.raycastHitDirection[i])
+                    {
+                        temp = 1;
+                        
+                    }
+                    let x = (this.raycastHitPosition[i][temp] - 5) / 5;
+                    x = x - Math.floor(x);
+                    x = x * this.textureWidth;
+                    
+                    if(x + pixelWidth >= this.textureWidth)
+                    {
+                        //x = this.textureWidth - this.pixelWidth;
+                        //renderable.setElementPixelPositions(x, this.textureWidth, 0, this.textureHeight);
+                        renderable.setElementPixelPositions(x, this.textureWidth, 0, this.textureHeight);
+                    }
+                    else{
+                        renderable.setElementPixelPositions(x, x + pixelWidth, 0, this.textureHeight);
+                    }
+                    
+                    if (this.wallShadows)
+                    {
+
+                    
+                        if(this.raycastHitDirection[i])
+                        {
+                            //renderable.setColor([0.4,0.1,0.1,1]);
+                            renderable.setColor([0,0,0,.4]);
+                        }
+                        else{
+                            //renderable.setColor([0.6,0.2,0.2,1]);
+                            renderable.setColor([1,1,1,0]);
+                        }
+                    }
                     
                 }
-                let x = this.raycastHitPosition[i][temp] / 5;
-                x = x - Math.floor(x);
-                x = x * this.textureWidth;
-                /*
-                if(x + pixelWidth >= this.textureWidth)
-                {
-                    x = this.textureWidth - this.pixelWidth;
-                }
                 */
-                renderable.setElementPixelPositions(x, x + pixelWidth, 0, this.textureHeight);
-
-                if(this.raycastHitDirection[i])
-                {
-                    //renderable.setColor([0.4,0.1,0.1,1]);
-                    renderable.setColor([0,0,0,.4]);
-                }
-                else{
-                    //renderable.setColor([0.6,0.2,0.2,1]);
-                    renderable.setColor([1,1,1,0]);
-                }
+                //let pixelStart = 0;
+                
+                
                 
                 
                 
@@ -355,7 +432,7 @@ class RCCamera extends Camera {
             lineRay.setColor([0,1,0,1]);
             lineRay.setFirstVertex(this.raycasterPosition[0], this.raycasterPosition[1]);
             //Currently, raycast hit position is within the grid coordinates (center is at grid bottom left) and not in real world coordinates
-            lineRay.setSecondVertex(this.raycastHitPosition[i][0] + this.tempGridPos[0], this.raycastHitPosition[i][1] + this.tempGridPos[1]);
+            lineRay.setSecondVertex(this.raycastHitPosition[i][0], this.raycastHitPosition[i][1]);
             
             lineRay.draw(secondCamera);
             

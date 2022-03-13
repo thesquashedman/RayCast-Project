@@ -1,5 +1,6 @@
 "use strict";  // Operate in Strict mode such that variables must be declared before used!
 
+import Tile from "../engine/game_objects/tile.js";
 import engine from "../engine/index.js";
 
 class MyGame extends engine.Scene {
@@ -7,12 +8,17 @@ class MyGame extends engine.Scene {
         super();
 
         this.kWall1 = "assets/realisticwall.webp";
-        this.kWall2 = "assets/wall1.png";
+        this.kWall2 = "assets/Vikings_tilemaps_000.bmp";
         this.kWall3 = "assets/missing_texture.png"
         // The camera to view the scene
         this.mCamera = null;
         this.mGridMap = null;
         this.mMsg = null;
+        this.tile1 = null;
+        this.tile2 = null;
+        this.tile3 = null;
+        this.tile0 = null;
+        this.tileArray = [];
         
     }
     load(){
@@ -30,7 +36,6 @@ class MyGame extends engine.Scene {
         engine.texture.unload(this.kWall3);
     }
     init() {
-
         this.mCamera = new engine.RCCamera(
             vec2.fromValues(50, 37.5), // position of the camera
             100,                       // width of camera
@@ -39,7 +44,20 @@ class MyGame extends engine.Scene {
         this.mCamera.setBackgroundColor([0, 0, 0, 1]);
         this.mCamera.TempTextureSetter(this.kWall1);
         this.mCamera.TempTexWidthHeightSetter(1300, 1300);
+
+        this.tile1 = new Tile([this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300]);
+        this.tile2 = new Tile([this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20]);
+        this.tile3 = new Tile([this.kWall2, 0, 20, 0, 20], [this.kWall1, 0, 1300, 0, 1300], [this.kWall2, 20, 40, 20, 40], [this.kWall3, 0, 200, 0, 200]);
+        this.tileArray = [
+            [this.tile1, this.tile1, this.tile3, this.tile1, this.tile1],
+            [this.tile1, this.tile2, this.tile0, this.tile2, this.tile1],
+            [this.tile1, this.tile3, this.tile0, this.tile0, this.tile1],
+            [this.tile2, this.tile0, this.tile0, this.tile0, this.tile3],
+            [this.tile1, this.tile3, this.tile2, this.tile0, this.tile2]
+        ];
+
         this.mGridMap = new engine.GridMap();
+        this.mGridMap.setTiles(this.tileArray);
         this.mCamera.Raycast(this.mGridMap);
 
         this.mMapCam = new engine.Camera(
@@ -145,7 +163,7 @@ class MyGame extends engine.Scene {
         if(engine.input.isKeyClicked(engine.input.keys.Two))
         {
             this.mCamera.TempTextureSetter(this.kWall2);
-            this.mCamera.TempTexWidthHeightSetter(32, 32);
+            this.mCamera.TempTexWidthHeightSetter(159.5, 20);
         }
         if(engine.input.isKeyClicked(engine.input.keys.Three))
         {

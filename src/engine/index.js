@@ -46,6 +46,7 @@ import { eAnimationType } from "./renderables/sprite_animate_renderable.js";
 import GameObject from "./game_objects/game_object.js";
 import GameObjectSet from "./game_objects/game_object_set.js";
 import GridMap from "./game_objects/grid_map.js";
+import Tile from "./game_objects/tile.js";
 
 // local to this file only
 import * as glSys from "./core/gl.js";
@@ -97,7 +98,7 @@ export default {
     Renderable, TextureRenderable, SpriteRenderable, SpriteAnimateRenderable, FontRenderable, LineRenderable,
 
     // Game Objects
-    GameObject, GameObjectSet, GridMap,
+    GameObject, GameObjectSet, GridMap, Tile,
 
     // constants
     eTexCoordArrayIndex, eAnimationType, eBoundCollideStatus,
