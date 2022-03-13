@@ -9,9 +9,9 @@ class GridMap{
             [true, null, null, null, true],
             [true, true, true, null, true]
         ];
-        this.mPos = [3, 5];
-        this.mWidth = 18;
-        this.mHeight = 25.5;
+        this.mPos = [0, 0];
+        this.mWidth = 25;
+        this.mHeight = 25;
 
     }
     setTiles(TileArray)

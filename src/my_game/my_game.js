@@ -19,6 +19,8 @@ class MyGame extends engine.Scene {
         this.tile3 = null;
         this.tile0 = null;
         this.tileArray = [];
+        this.mSquare = null;
+        this.mSpriteRenderable = null;
         
     }
     load(){
@@ -49,11 +51,11 @@ class MyGame extends engine.Scene {
         this.tile2 = new Tile([this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20]);
         this.tile3 = new Tile([this.kWall2, 0, 20, 0, 20], [this.kWall1, 0, 1300, 0, 1300], [this.kWall2, 20, 40, 20, 40], [this.kWall3, 0, 200, 0, 200]);
         this.tileArray = [
-            [this.tile1, this.tile1, this.tile3, this.tile1, this.tile1],
-            [this.tile1, this.tile2, this.tile0, this.tile2, this.tile1],
-            [this.tile1, this.tile3, this.tile0, this.tile0, this.tile1],
-            [this.tile2, this.tile0, this.tile0, this.tile0, this.tile3],
-            [this.tile1, this.tile3, this.tile2, this.tile0, this.tile2]
+            [this.tile1, this.tile1, this.tile3, this.tile1, this.tile0, this.tile1],
+            [this.tile1, this.tile2, this.tile0, this.tile2, this.tile0, this.tile1],
+            [this.tile1, this.tile3, this.tile0, this.tile0, this.tile0, this.tile1],
+            [this.tile2, this.tile0, this.tile0, this.tile0, this.tile0, this.tile1],
+            [this.tile1, this.tile3, this.tile2, this.tile0, this.tile0, this.tile1]
         ];
 
         this.mGridMap = new engine.GridMap();
@@ -92,6 +94,12 @@ class MyGame extends engine.Scene {
         this.mMsg.getXform().setPosition(2, 2);
         this.mMsg.setTextHeight(2);
 
+        this.mSquare = new engine.Renderable();
+        this.mSquare.getXform().setPosition(7,7);
+        this.mSquare.setColor([0,0,1,1]);
+
+        this.mSpriteRenderable = new engine.RCSpriteRenderable(this.kWall1);
+
 
     }
     
@@ -110,6 +118,8 @@ class MyGame extends engine.Scene {
         this.mMapCharRenderable.draw(this.mMapCam);
         this.mCamera.drawRayLines(this.mMapCam);
         this.mMapCharLineR.draw(this.mMapCam);
+        this.mSquare.draw(this.mMapCam);
+        this.mSpriteRenderable.draw(this.mCamera, [this.mSquare.getXform().getPosition()[0], this.mSquare.getXform().getPosition()[1]]);
         
         
     }

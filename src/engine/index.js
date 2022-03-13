@@ -39,6 +39,7 @@ import SpriteRenderable from "./renderables/sprite_renderable.js";
 import SpriteAnimateRenderable from "./renderables/sprite_animate_renderable.js";
 import FontRenderable from "./renderables/font_renderable.js";
 import LineRenderable from "./renderables/line_renderable.js";
+import RCSpriteRenderable from "./renderables/rc_sprite_renderable.js";
 import { eTexCoordArrayIndex } from "./renderables/sprite_renderable.js";
 import { eAnimationType } from "./renderables/sprite_animate_renderable.js";
 
@@ -95,7 +96,7 @@ export default {
     Camera, RCCamera, Scene, Transform, BoundingBox,  
      
     // Renderables
-    Renderable, TextureRenderable, SpriteRenderable, SpriteAnimateRenderable, FontRenderable, LineRenderable,
+    Renderable, TextureRenderable, SpriteRenderable, SpriteAnimateRenderable, FontRenderable, LineRenderable, RCSpriteRenderable,
 
     // Game Objects
     GameObject, GameObjectSet, GridMap, Tile,

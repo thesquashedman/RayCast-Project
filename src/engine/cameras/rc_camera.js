@@ -346,69 +346,14 @@ class RCCamera extends Camera {
                 
                 let yStart = ymiddle + height/2;
                 let yEnd = ymiddle - height/2;
-                //console.log("line " + i + " xpos: " + xpos + "height: " + height);
-
-                //let renderable = new engine.Renderable(); // this can be a texture later.
-                let renderable = null;
-                renderable = new engine.SpriteRenderable(this.raycastWallsHit[i]);
+                
+                
+                let renderable = new engine.SpriteRenderable(this.raycastWallsHit[i]);
                 renderable.getXform().setPosition(xpos, ymiddle  + this.horizonLine);
                 renderable.getXform().setSize(width/(this.resolution), height);
                 //console.log(this.raycastWallsUVPixels[i][0] + " " + this.raycastWallsUVPixels[i][1] + " " + this.raycastWallsUVPixels[i][2] + " " + this.raycastWallsUVPixels[i][3]);
                 renderable.setElementPixelPositions(this.raycastWallsUVPixels[i][0], this.raycastWallsUVPixels[i][1], this.raycastWallsUVPixels[i][2], this.raycastWallsUVPixels[i][3]);
-                /*
-                if(!this.raycastHitDirection[i])
-                {
-                    renderable = new engine.SpriteRenderable(this.raycastWallsHit[i]);
-                    renderable.getXform().setPosition(xpos, ymiddle  + this.horizonLine);
-                    renderable.getXform().setSize(width/(this.resolution), height);
-                    //console.log(this.raycastWallsUVPixels[i][0] + " " + this.raycastWallsUVPixels[i][1] + " " + this.raycastWallsUVPixels[i][2] + " " + this.raycastWallsUVPixels[i][3]);
-                    renderable.setElementPixelPositions(this.raycastWallsUVPixels[i][0], this.raycastWallsUVPixels[i][1], this.raycastWallsUVPixels[i][2], this.raycastWallsUVPixels[i][3]);
-                }
-                else
-                {
-                    renderable = new engine.SpriteRenderable(this.tempTextureHolder);
-                    renderable.getXform().setPosition(xpos, ymiddle  + this.horizonLine);
-                    renderable.getXform().setSize(width/(this.resolution), height);
-
-                    let pixelWidth = this.textureWidth / (this.resolution);
-                    let temp = 0
-                    if(!this.raycastHitDirection[i])
-                    {
-                        temp = 1;
-                        
-                    }
-                    let x = (this.raycastHitPosition[i][temp] - 5) / 5;
-                    x = x - Math.floor(x);
-                    x = x * this.textureWidth;
-                    
-                    if(x + pixelWidth >= this.textureWidth)
-                    {
-                        //x = this.textureWidth - this.pixelWidth;
-                        //renderable.setElementPixelPositions(x, this.textureWidth, 0, this.textureHeight);
-                        renderable.setElementPixelPositions(x, this.textureWidth, 0, this.textureHeight);
-                    }
-                    else{
-                        renderable.setElementPixelPositions(x, x + pixelWidth, 0, this.textureHeight);
-                    }
-                    
-                    if (this.wallShadows)
-                    {
-
-                    
-                        if(this.raycastHitDirection[i])
-                        {
-                            //renderable.setColor([0.4,0.1,0.1,1]);
-                            renderable.setColor([0,0,0,.4]);
-                        }
-                        else{
-                            //renderable.setColor([0.6,0.2,0.2,1]);
-                            renderable.setColor([1,1,1,0]);
-                        }
-                    }
-                    
-                }
-                */
-                //let pixelStart = 0;
+                
                 
                 
                 
@@ -463,6 +408,14 @@ class RCCamera extends Camera {
 
     moveRayCasterAngle(d) {
         this.raycasterAngle += d;
+        while(this.raycasterAngle > 2 * Math.PI)
+        {
+            this.raycasterAngle -= 2 * Math.PI;
+        }
+        while(this.raycasterAngle < 0)
+        {
+            this.raycasterAngle += 2 * Math.PI;
+        }
     }
 
     moveRayCasterForward(d) {
@@ -496,6 +449,10 @@ class RCCamera extends Camera {
     incHorizonLine(d)
     {
         this.horizonLine += d;
+    }
+    getRaycastLengths()
+    {
+        return this.raycastLengths;
     }
 
 }
