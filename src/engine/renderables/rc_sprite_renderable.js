@@ -48,20 +48,19 @@ class RCSpriteRenderable extends SpriteRenderable{
         }
         if(upperBound > Math.PI * 2)
         {
-            //upperBound -= Math.PI * 2;
+            upperBound -= Math.PI * 2;
             inverseUpper = true;
-        }
-        let within = false;
-        if(tempAngle < upperBound && tempAngle > lowerBound)
-        {
-            within = true;
         }
         //console.log("Within");
         let index = 0;
+        let indexProportion = 0;
         if(inverseLower || inverseUpper)
         {
+
+            console.log("inverse");
             let offset = 2* Math.PI - lowerBound;
             index = (resolution - 2) - Math.floor((offset + angle)/(upperBound + offset) * (resolution - 1));
+            
 
 
         }

@@ -44,8 +44,6 @@ class MyGame extends engine.Scene {
             [0, 0, 640, 480]           // viewport (orgX, orgY, width, height)
         );
         this.mCamera.setBackgroundColor([0, 0, 0, 1]);
-        this.mCamera.TempTextureSetter(this.kWall1);
-        this.mCamera.TempTexWidthHeightSetter(1300, 1300);
 
         this.tile1 = new Tile([this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300]);
         this.tile2 = new Tile([this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20]);
@@ -55,7 +53,7 @@ class MyGame extends engine.Scene {
             [this.tile1, this.tile2, this.tile0, this.tile2, this.tile0, this.tile1],
             [this.tile1, this.tile3, this.tile0, this.tile0, this.tile0, this.tile1],
             [this.tile2, this.tile0, this.tile0, this.tile0, this.tile0, this.tile1],
-            [this.tile1, this.tile3, this.tile2, this.tile0, this.tile0, this.tile1]
+            [this.tile1, this.tile3, this.tile2, this.tile1, this.tile0, this.tile1]
         ];
 
         this.mGridMap = new engine.GridMap();
@@ -165,21 +163,7 @@ class MyGame extends engine.Scene {
         {
             this.mCamera.setResolution(this.mCamera.getResolution() + 0.5);
         }
-        if(engine.input.isKeyClicked(engine.input.keys.One))
-        {
-            this.mCamera.TempTextureSetter(this.kWall1);
-            this.mCamera.TempTexWidthHeightSetter(1300, 1300);
-        }
-        if(engine.input.isKeyClicked(engine.input.keys.Two))
-        {
-            this.mCamera.TempTextureSetter(this.kWall2);
-            this.mCamera.TempTexWidthHeightSetter(159.5, 20);
-        }
-        if(engine.input.isKeyClicked(engine.input.keys.Three))
-        {
-            this.mCamera.TempTextureSetter(this.kWall3);
-            this.mCamera.TempTexWidthHeightSetter(200, 200);
-        }
+        
         if(engine.input.isKeyPressed(engine.input.keys.O))
         {
             this.mCamera.incHorizonLine(-0.3);

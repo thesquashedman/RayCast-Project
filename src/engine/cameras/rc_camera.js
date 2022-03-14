@@ -20,23 +20,11 @@ class RCCamera extends Camera {
         this.raycastWallsUVPixels = [];
         this.effect1 = false;
 
-        this.tempTextureHolder = null;
-        this.textureWidth = 32;
-        this.textureHeight = 32;
         this.fisheye = false;
         this.horizonLine = 0;
-        this.tempWallHeight = 1;
         this.wallShadows = true;
     }
-    TempTextureSetter(texture)
-    {
-        this.tempTextureHolder = texture;
-    }
-    TempTexWidthHeightSetter(width, height)
-    {
-        this.textureWidth = width;
-        this.textureHeight = height;
-    }
+    
     
     Raycast(GridMap)
     {
