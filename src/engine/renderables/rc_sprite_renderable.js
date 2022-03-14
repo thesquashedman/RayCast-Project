@@ -7,9 +7,39 @@ import engine from "../index.js";
 class RCSpriteRenderable extends SpriteAnimateRenderable{
     constructor(myTexture) {
         super(myTexture);
-        this.mSpriteSize = 1;
-        this.yOffset = 0;
+        this.mScaleX = 1;
+        this.mScaleY = 1;
+        //Proportional to height. If yOffset = 1, moves up 1 * height of model.
+        this.mYOffset = 0;
+        this.visible = false;
     }
+    getScaleX()
+    {
+        return this.mScaleX;
+    }
+    setScaleX(x)
+    {
+        this.mScaleX = x;
+    }
+    getScaleY()
+    {
+        return this.mScaleY;
+    }
+    setScaleY(y)
+    {
+        this.mScaleY = y;
+    }
+    getYOffset()
+    {
+        return this.mYOffset;
+    }
+    setYOffset(y)
+    {
+        this.mYOffset = y;
+    }
+
+
+
     draw(camera, position)
     {
         let cameraPos = camera.getRayCasterPos();
@@ -73,10 +103,10 @@ class RCSpriteRenderable extends SpriteAnimateRenderable{
         if(index >= 0 && index < resolution - 1)
         {
             
-            if( (camera.getRaycastLengths()[index] > distance && camera.getRaycastLengths()[index + 1] > distance) || 
-                (camera.getRaycastLengths()[index] < 0 && camera.getRaycastLengths()[index + 1] > distance) ||
-                (camera.getRaycastLengths()[index] > distance && camera.getRaycastLengths()[index + 1] < 0) ||
-                (camera.getRaycastLengths()[index] < 0 && camera.getRaycastLengths()[index + 1] < 0)
+            if( (camera.getRayLengths()[index] > distance && camera.getRayLengths()[index + 1] > distance) || 
+                (camera.getRayLengths()[index] < 0 && camera.getRayLengths()[index + 1] > distance) ||
+                (camera.getRayLengths()[index] > distance && camera.getRayLengths()[index + 1] < 0) ||
+                (camera.getRayLengths()[index] < 0 && camera.getRayLengths()[index + 1] < 0)
             )
             {
                 
@@ -87,23 +117,29 @@ class RCSpriteRenderable extends SpriteAnimateRenderable{
                     let r = distance * Math.abs(Math.cos(angle - camera.getRayCasterAngle()));
                     scale = camera.getWCHeight() / r;
                 }
-                let yPosition = camera.getWCCenter()[1] + camera.getHorizonLine();
-                let xPosition = (camera.getWCCenter()[0]-camera.getWCWidth()/2 - scale/2) + ((index+indexProportion)/resolution) * (camera.getWCWidth() + scale);
+                let yPosition = camera.getWCCenter()[1] + camera.getHorizonLine() + this.mYOffset * scale * this.mScaleX;
+                let xPosition = (camera.getWCCenter()[0]-camera.getWCWidth()/2 - (scale *this.mScaleX)/2) + ((index+indexProportion)/resolution) * (camera.getWCWidth() + scale * this.mScaleX);
                 
                 
                 this.getXform().setPosition(xPosition, yPosition);
-                this.getXform().setSize(scale, scale);
+                this.getXform().setSize(scale *this.mScaleX, scale *this.mScaleY);
+                this.visible = true;
                 super.draw(camera);
+                
                 //renderable.draw(camera);
                 //super.draw(camera);
             }
+            else{
+                this.visible = false;
+            }
         }
+        
         
     
         
         
         
-        //this.mXform.getSize()
+        
         
     }
 

@@ -141,10 +141,6 @@ class MyGame extends engine.Scene {
         if (engine.input.isKeyPressed(engine.input.keys.S)) {
             this.mCamera.moveRayCasterForward(-0.09);
         }
-        if(engine.input.isKeyClicked(engine.input.keys.Space))
-        {
-            this.mCamera.enableEffect1();
-        }
         if(engine.input.isKeyClicked(engine.input.keys.F))
         {
             this.mCamera.toggleFishEye();
@@ -168,7 +164,7 @@ class MyGame extends engine.Scene {
         
         if(engine.input.isKeyPressed(engine.input.keys.O))
         {
-            this.mCamera.incHorizonLine(-0.3);
+            this.mCamera.moveHorizonLine(-0.3);
         }
         if(engine.input.isKeyPressed(engine.input.keys.P))
         {

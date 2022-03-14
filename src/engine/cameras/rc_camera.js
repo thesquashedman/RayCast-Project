@@ -10,30 +10,142 @@ class RCCamera extends Camera {
         super(wcCenter, wcWidth, viewportArray, bound);
         this.fov =  Math.PI/2;
         this.resolution = 50;
-        this.raycasterPosition = [12.5, 12.5];
         this.raycasterAngle = 0;
-        this.raycastLengths = [];
-        this.raycastHitPosition = [];
-        this.raycastHitDirection = []; //True corresponds to hitting top or bottom wall, false corresponds to hitting left or right wall.
+        this.raycasterPosition = [12.5, 12.5];
+        this.horizonLine = 0;
+        this.rayLengths = [];
+        this.rayHitPosition = [];
+        this.rayHitDirection = []; //True corresponds to hitting top or bottom wall, false corresponds to hitting left or right wall.
         this.rayAngles = [];
-        this.raycastWallsHit = [];
-        this.raycastWallsUVPixels = [];
-        this.effect1 = false;
+        this.rayWallsHit = [];
+        this.rayWallsUVPixels = [];
 
         this.fisheye = false;
-        this.horizonLine = 0;
         this.wallShadows = true;
     }
+
+
+
+    setFOV(fov)
+    {
+        this.fov = fov;
+    }
+
+    getFOV()
+    {
+        return this.fov;
+    }
+
+    setResolution(resolution)
+    {
+        this.resolution = resolution;
+    }
+
+    getResolution()
+    {
+        return this.resolution;
+    }
     
+    setRayCasterAngle(t) {
+        this.raycasterAngle = t;
+        while(this.raycasterAngle > 2 * Math.PI)
+        {
+            this.raycasterAngle -= 2 * Math.PI;
+        }
+        while(this.raycasterAngle < 0)
+        {
+            this.raycasterAngle += 2 * Math.PI;
+        }
+    }
+
+    getRayCasterAngle() {
+        return this.raycasterAngle;
+    }
+
+    moveRayCasterAngle(d) {
+        this.raycasterAngle += d;
+        while(this.raycasterAngle > 2 * Math.PI)
+        {
+            this.raycasterAngle -= 2 * Math.PI;
+        }
+        while(this.raycasterAngle < 0)
+        {
+            this.raycasterAngle += 2 * Math.PI;
+        }
+    }
+
+    setRayCasterPos(posX, posY)
+    {
+        this.raycasterPosition[0] = posX;
+        this.raycasterPosition[1] = posY;
+    }
+
+    getRayCasterPos() {
+        return this.raycasterPosition;
+    }
+
+    getRayCasterXPos()
+    {
+        return this.raycasterPosition[0];
+    }
+
+    getRayCasterYPos()
+    {
+        return this.raycasterPosition[1];
+    }
+
+    moveRayCasterForward(d) {
+        this.raycasterPosition[0] += Math.cos(this.raycasterAngle)*d;
+        this.raycasterPosition[1] += Math.sin(this.raycasterAngle)*d;
+    }
+
+    getFishEye()
+    {
+        return this.fisheye;
+    }
+
+    setFishEye(b)
+    {
+        this.fisheye = b;
+    }
+
+    toggleFishEye()
+    {
+        this.fisheye = !this.fisheye;
+    }
+
+    setHorizonLine(t)
+    {
+        this.horizonLine = t;
+    }
+
+    getHorizonLine()
+    {
+        return this.horizonLine;
+    }
+
+    moveHorizonLine(d)
+    {
+        this.horizonLine += d;
+    }
+
+    getRayLengths()
+    {
+        return this.rayLengths;
+    }
+
+
     
+
+
     Raycast(GridMap)
     {
-        this.raycastLengths = []; // empty it
-        this.raycastHitPosition = [];
-        this.raycastHitDirection = [];
+        this.rayLengths = []; // empty it
+        this.rayHitPosition = [];
+        this.rayHitDirection = [];
         this.rayAngles = [];
-        this.raycastWallsHit = [];
-        this.raycastWallsUVPixels = [];
+        this.rayWallsHit = [];
+        this.rayWallsUVPixels = [];
         for(let i = 0; i < this.resolution; i++)
         {
             let theta = this.raycasterAngle + this.fov/2 - i * (this.fov/(this.resolution - 1));
@@ -41,22 +153,22 @@ class RCCamera extends Camera {
             {
                 theta = this.raycasterAngle;
             }
-            this.raycastLengths.push(this._CastRay(theta, GridMap));
+            this.rayLengths.push(this._CastRay(theta, GridMap));
             //console.log("length: " + this.raycastLengths[i] + " Angle: " + theta);
 
         }
         
     }
-    //Complete mess, don't even try to make sense of it, just straight up contact me if you something from it.
+    //Complete mess, don't even try to make sense of it, just straight up contact me if you something from it at pavo_peev@yahoo.com.
     _CastRay(theta, GridMap)
     {
         this.rayAngles.push(theta);
         let positionInGrid = [this.raycasterPosition[0] - GridMap.getPosition()[0], this.raycasterPosition[1] - GridMap.getPosition()[1]];
         let numberOfTime = 0;
         let currentDistance = 0;
-        let perfectY = false;
-        let perfectX = false;
-        let perfectXIndex = 0;
+        let perfectY = false; //If it moved the position to a y gridline, then use the index of that line instead of calculating a new one
+        let perfectX = false; //If it moved the position to a x gridline, then use the index of that line instead of calculating a new one
+        let perfectXIndex = 0; 
         let perfectYIndex = 0;
         //Checks whether the current position it's checking for the raycast is within the GridMap
         while (
@@ -153,20 +265,20 @@ class RCCamera extends Camera {
                     if(tile != null)
                     {
                         //console.log(positionInGrid[0] + " " + positionInGrid[1]);
-                        this.raycastHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
-                        this.raycastHitDirection.push(true);
+                        this.rayHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
+                        this.rayHitDirection.push(true);
                         let texture = null;
                         let up = null;
                         if(Math.sin(theta) < 0)
                         {
                             texture = tile.getTopTexture();
-                            this.raycastWallsHit.push(texture[0]);
+                            this.rayWallsHit.push(texture[0]);
                             up = false;
                         }
                         else
                         {
                             texture = tile.getBottomTexture();
-                            this.raycastWallsHit.push(texture[0]);
+                            this.rayWallsHit.push(texture[0]);
                             up = true;
                         }
                         let pixelWidth = (texture[2] - texture[1])/this.resolution;
@@ -177,25 +289,25 @@ class RCCamera extends Camera {
                         {
                             if(up)
                             {
-                                this.raycastWallsUVPixels.push([x + texture[1], texture[2], texture[3], texture[4]]);
+                                this.rayWallsUVPixels.push([x + texture[1], texture[2], texture[3], texture[4]]);
                             }
                             else{
-                                this.raycastWallsUVPixels.push([(texture[2] - x) + texture[1], texture[1], texture[3], texture[4]]);
+                                this.rayWallsUVPixels.push([(texture[2] - x) + texture[1], texture[1], texture[3], texture[4]]);
                             }
                             
                         }
                         else{
-                            //this.raycastWallsUVPixels.push([x + texture[1], texture[2], texture[3], texture[4]]);
+                            
                             if(up)
                             {
-                                this.raycastWallsUVPixels.push([x + texture[1], x + texture[1] + pixelWidth, texture[3], texture[4]]);
+                                this.rayWallsUVPixels.push([x + texture[1], x + texture[1] + pixelWidth, texture[3], texture[4]]);
                             }
                             else{
-                                this.raycastWallsUVPixels.push([(texture[2] - x) + texture[1], (texture[2] - x) + texture[1] - pixelWidth, texture[3], texture[4]]);
+                                this.rayWallsUVPixels.push([(texture[2] - x) + texture[1], (texture[2] - x) + texture[1] - pixelWidth, texture[3], texture[4]]);
                             }
                             
                         }
-                        //this.raycastWallsUVPixels.push([null, null, null, null]);
+                        
                         return currentDistance;
                     }
                 }
@@ -204,6 +316,7 @@ class RCCamera extends Camera {
                 
                 
             }
+            //Next horizontal gridline closer than next vertical gridline
             else
             {
                 //let xIndex = Math.floor(nextX / GridMap.getWidthOfTile());
@@ -222,21 +335,21 @@ class RCCamera extends Camera {
                     if(tile != null)
                     {
                         //console.log(positionInGrid[0] + " " + positionInGrid[1]);
-                        this.raycastHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
-                        this.raycastHitDirection.push(false);
+                        this.rayHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
+                        this.rayHitDirection.push(false);
 
                         let texture = null;
                         let left = null;
                         if(Math.cos(theta) < 0)
                         {
                             texture = tile.getRightTexture();
-                            this.raycastWallsHit.push(texture[0]);
+                            this.rayWallsHit.push(texture[0]);
                             left = true;
                         }
                         else
                         {
                             texture = tile.getLeftTexture();
-                            this.raycastWallsHit.push(texture[0]);
+                            this.rayWallsHit.push(texture[0]);
                             left = false;
                         }
                         let pixelWidth = (texture[2] - texture[1])/this.resolution;
@@ -247,21 +360,21 @@ class RCCamera extends Camera {
                         {
                             if(left)
                             {
-                                this.raycastWallsUVPixels.push([x + texture[1], texture[2], texture[3], texture[4]]);
+                                this.rayWallsUVPixels.push([x + texture[1], texture[2], texture[3], texture[4]]);
                             }
                             else{
-                                this.raycastWallsUVPixels.push([(texture[2] - x) + texture[1], texture[1], texture[3], texture[4]]);
+                                this.rayWallsUVPixels.push([(texture[2] - x) + texture[1], texture[1], texture[3], texture[4]]);
                             }
                             
                         }
                         else{
-                            //this.raycastWallsUVPixels.push([x + texture[1], texture[2], texture[3], texture[4]]);
+                            
                             if(left)
                             {
-                                this.raycastWallsUVPixels.push([x + texture[1], x + texture[1] + pixelWidth, texture[3], texture[4]]);
+                                this.rayWallsUVPixels.push([x + texture[1], x + texture[1] + pixelWidth, texture[3], texture[4]]);
                             }
                             else{
-                                this.raycastWallsUVPixels.push([(texture[2] - x) + texture[1], (texture[2] - x) + texture[1] - pixelWidth, texture[3], texture[4]]);
+                                this.rayWallsUVPixels.push([(texture[2] - x) + texture[1], (texture[2] - x) + texture[1] - pixelWidth, texture[3], texture[4]]);
                             }
                             
                         }
@@ -271,17 +384,15 @@ class RCCamera extends Camera {
                 }
                 perfectX = true;
                 perfectY = false;
-                
             }
-            
             numberOfTime++;
             if(numberOfTime >250)
             {
                 console.log("Stuck in loop " + positionInGrid[0] + " " + positionInGrid[1] + " " + (theta / Math.PI) * 180 + " " + this.raycasterPosition[0] + " " + this.raycastHitPosition);
-                this.raycastHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
-                this.raycastHitDirection.push(null);
-                this.raycastWallsHit.push(null);
-                this.raycastWallsUVPixels.push([null, null, null, null]);
+                this.rayHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
+                this.rayHitDirection.push(null);
+                this.rayWallsHit.push(null);
+                this.rayWallsUVPixels.push([null, null, null, null]);
                 return -15;
             }
             
@@ -289,33 +400,30 @@ class RCCamera extends Camera {
 
         }
         //If it gets outside the GridMap, return -1 to show that it didn't hit
-        this.raycastHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
-        this.raycastHitDirection.push(null);
-        this.raycastWallsHit.push(null);
-        this.raycastWallsUVPixels.push([null, null, null, null]);
+        this.rayHitPosition.push([positionInGrid[0] + GridMap.getPosition()[0], positionInGrid[1] + GridMap.getPosition()[1]]);
+        this.rayHitDirection.push(null);
+        this.rayWallsHit.push(null);
+        this.rayWallsUVPixels.push([null, null, null, null]);
         return -1;
     }
+
+
+
 
     DrawRays() {
         let xStart = this.getWCCenter()[0]-this.getWCWidth()/2;
         let ymiddle = this.getWCCenter()[1];
         let width = this.getWCWidth();
         for (let i = 0; i < this.resolution; i++) {
-            if(this.raycastLengths[i] >= 0)
+            if(this.rayLengths[i] >= 0)
             {
                 let xpos = xStart + (i/this.resolution)*width;
                 xpos += 1/(2 * this.resolution) * width; // Moves it over slightly so that it fills the screen.
-                let height = this.getWCHeight() / this.raycastLengths[i];
+                let height = this.getWCHeight() / this.rayLengths[i];
                 if(!this.fisheye)
                 {
-                    let r = this.raycastLengths[i] * Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
+                    let r = this.rayLengths[i] * Math.abs(Math.cos(this.rayAngles[i] - this.raycasterAngle));
 
-                    //Applies back warping if the angle is greater than 45 degrees, not necissary but effect makes FOVS greater than 90 degrees less vomit inducing
-                    if(Math.abs(this.rayAngles[i] - this.raycasterAngle) > Math.PI/4 && this.effect1)
-                    {
-                        r = this.raycastLengths[i] * Math.abs(Math.sin(this.rayAngles[i] - this.raycasterAngle));
-                        //r /= Math.abs(Math.cos(2 * (this.rayAngles[i] - this.raycasterAngle) - Math.PI/2));
-                    }
                     if(r == 0)
                     {
                         r = 0.000001;
@@ -336,14 +444,14 @@ class RCCamera extends Camera {
                 let yEnd = ymiddle - height/2;
                 
                 
-                let renderable = new engine.SpriteRenderable(this.raycastWallsHit[i]);
+                let renderable = new engine.SpriteRenderable(this.rayWallsHit[i]);
                 renderable.getXform().setPosition(xpos, ymiddle  + this.horizonLine);
                 renderable.getXform().setSize(width/(this.resolution), height);
                 //console.log(this.raycastWallsUVPixels[i][0] + " " + this.raycastWallsUVPixels[i][1] + " " + this.raycastWallsUVPixels[i][2] + " " + this.raycastWallsUVPixels[i][3]);
-                renderable.setElementPixelPositions(this.raycastWallsUVPixels[i][0], this.raycastWallsUVPixels[i][1], this.raycastWallsUVPixels[i][2], this.raycastWallsUVPixels[i][3]);
+                renderable.setElementPixelPositions(this.rayWallsUVPixels[i][0], this.rayWallsUVPixels[i][1], this.rayWallsUVPixels[i][2], this.rayWallsUVPixels[i][3]);
                 if(this.wallShadows)
                 {
-                    if(!this.raycastHitDirection[i])
+                    if(!this.rayHitDirection[i])
                     {
                         renderable.setColor([0, 0, 0, 0.3]);
                     }
@@ -372,7 +480,7 @@ class RCCamera extends Camera {
             lineRay.setColor([0,1,0,1]);
             lineRay.setFirstVertex(this.raycasterPosition[0], this.raycasterPosition[1]);
             //Currently, raycast hit position is within the grid coordinates (center is at grid bottom left) and not in real world coordinates
-            lineRay.setSecondVertex(this.raycastHitPosition[i][0], this.raycastHitPosition[i][1]);
+            lineRay.setSecondVertex(this.rayHitPosition[i][0], this.rayHitPosition[i][1]);
             
             lineRay.draw(secondCamera);
             
@@ -380,79 +488,7 @@ class RCCamera extends Camera {
         
     }
 
-    setFOV(fov)
-    {
-        this.fov = fov;
-    }
-    getFOV()
-    {
-        return this.fov;
-    }
-    setResolution(resolution)
-    {
-        this.resolution = resolution;
-    }
-    getResolution()
-    {
-        return this.resolution;
-    }
-
-    setRayCasterAngle(t) {
-        this.raycasterAngle = t;
-    }
-
-    moveRayCasterAngle(d) {
-        this.raycasterAngle += d;
-        while(this.raycasterAngle > 2 * Math.PI)
-        {
-            this.raycasterAngle -= 2 * Math.PI;
-        }
-        while(this.raycasterAngle < 0)
-        {
-            this.raycasterAngle += 2 * Math.PI;
-        }
-    }
-
-    moveRayCasterForward(d) {
-        this.raycasterPosition[0] += Math.cos(this.raycasterAngle)*d;
-        this.raycasterPosition[1] += Math.sin(this.raycasterAngle)*d;
-    }
-
-    getRayCasterPos() {
-        return this.raycasterPosition;
-    }
-
-    getRayCasterAngle() {
-        return this.raycasterAngle;
-    }
-    getEffect1()
-    {
-        return this.effect1;
-    }
-    enableEffect1()
-    {
-        this.effect1 = !this.effect1;
-    }
-    getFishEye()
-    {
-        return this.fisheye;
-    }
-    toggleFishEye()
-    {
-        this.fisheye = !this.fisheye;
-    }
-    incHorizonLine(d)
-    {
-        this.horizonLine += d;
-    }
-    getHorizonLine()
-    {
-        return this.horizonLine;
-    }
-    getRaycastLengths()
-    {
-        return this.raycastLengths;
-    }
+    
 
 }
 export default RCCamera;
