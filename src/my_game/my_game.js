@@ -9,7 +9,8 @@ class MyGame extends engine.Scene {
 
         this.kWall1 = "assets/realisticwall.webp";
         this.kWall2 = "assets/Vikings_tilemaps_000.bmp";
-        this.kWall3 = "assets/missing_texture.png"
+        this.kWall3 = "assets/missing_texture.png";
+        this.kSprite = "assets/favicon.png";
         // The camera to view the scene
         this.mCamera = null;
         this.mGridMap = null;
@@ -28,6 +29,7 @@ class MyGame extends engine.Scene {
         engine.texture.load(this.kWall1);
         engine.texture.load(this.kWall2);
         engine.texture.load(this.kWall3);
+        engine.texture.load(this.kSprite);
         
 
     }
@@ -96,7 +98,7 @@ class MyGame extends engine.Scene {
         this.mSquare.getXform().setPosition(7,7);
         this.mSquare.setColor([0,0,1,1]);
 
-        this.mSpriteRenderable = new engine.RCSpriteRenderable(this.kWall1);
+        this.mSpriteRenderable = new engine.RCSpriteRenderable(this.kSprite);
 
 
     }
@@ -107,7 +109,7 @@ class MyGame extends engine.Scene {
         this.mCamera.setViewAndCameraMatrix();
         this.mCamera.DrawRays();
         this.mMsg.draw(this.mCamera);
-        
+        this.mSpriteRenderable.draw(this.mCamera, [this.mSquare.getXform().getPosition()[0], this.mSquare.getXform().getPosition()[1]]);
 
         this.mMapCam.setViewAndCameraMatrix();
         for (let i = 0; i < this.mGridMap2DRenderables.length; i++) {
@@ -117,7 +119,7 @@ class MyGame extends engine.Scene {
         this.mCamera.drawRayLines(this.mMapCam);
         this.mMapCharLineR.draw(this.mMapCam);
         this.mSquare.draw(this.mMapCam);
-        this.mSpriteRenderable.draw(this.mCamera, [this.mSquare.getXform().getPosition()[0], this.mSquare.getXform().getPosition()[1]]);
+        
         
         
     }

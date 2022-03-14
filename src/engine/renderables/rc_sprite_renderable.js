@@ -1,7 +1,7 @@
 "use strict";
 
 import SpriteRenderable from "./sprite_renderable.js";
-
+import engine from "../index.js";
 
 class RCSpriteRenderable extends SpriteRenderable{
     constructor(myTexture) {
@@ -60,21 +60,41 @@ class RCSpriteRenderable extends SpriteRenderable{
             console.log("inverse");
             let offset = 2* Math.PI - lowerBound;
             index = (resolution - 2) - Math.floor((offset + angle)/(upperBound + offset) * (resolution - 1));
-            
+            indexProportion = index - ((resolution - 2) - (offset + angle)/(upperBound + offset) * (resolution - 1));
+            indexProportion = 1- Math.abs(indexProportion);
 
 
         }
         else{
             index = (resolution - 2) - Math.floor((tempAngle - lowerBound)/(upperBound - lowerBound) * (resolution - 1));
+            indexProportion = index - ((resolution - 2) - (tempAngle - lowerBound)/(upperBound - lowerBound) * (resolution - 1));
+            indexProportion = 1- Math.abs(indexProportion);
             
         }
         console.log(index + " Index");
+        console.log(indexProportion + " IndexProportion");
         if(index >= 0 && index < resolution - 1)
         {
             console.log("within");
             if(camera.getRaycastLengths()[index] > distance && camera.getRaycastLengths()[index + 1] > distance)
             {
                 console.log("Visible");
+                //let renderable = new engine.SpriteRenderable(this.mTexture);
+                
+                let scale = camera.getWCHeight() / distance;
+                if(!camera.getFishEye())
+                {
+                    let r = distance * Math.abs(Math.cos(angle - camera.getRayCasterAngle()));
+                    scale = camera.getWCHeight() / r;
+                }
+                let yPosition = camera.getWCCenter()[1] + camera.getHorizonLine();
+                let xPosition = (camera.getWCCenter()[0]-camera.getWCWidth()/2 - scale/2) + ((index+indexProportion)/resolution) * (camera.getWCWidth() + scale);
+                
+                
+                this.getXform().setPosition(xPosition, yPosition);
+                this.getXform().setSize(scale, scale);
+                super.draw(camera);
+                //renderable.draw(camera);
                 //super.draw(camera);
             }
         }

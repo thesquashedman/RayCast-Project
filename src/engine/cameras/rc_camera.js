@@ -438,6 +438,10 @@ class RCCamera extends Camera {
     {
         this.horizonLine += d;
     }
+    getHorizonLine()
+    {
+        return this.horizonLine;
+    }
     getRaycastLengths()
     {
         return this.raycastLengths;
