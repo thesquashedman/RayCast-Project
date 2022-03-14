@@ -2,13 +2,7 @@
 class GridMap{
     constructor()
     {
-        this.mTiles = [
-            [true, true, true, true, true],
-            [true, true, null, true, true],
-            [true, true, null, null, true],
-            [true, null, null, null, true],
-            [true, true, true, null, true]
-        ];
+        this.mTiles = [];
         this.mPos = [0, 0];
         this.mWidth = 25;
         this.mHeight = 25;

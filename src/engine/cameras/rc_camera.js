@@ -341,6 +341,13 @@ class RCCamera extends Camera {
                 renderable.getXform().setSize(width/(this.resolution), height);
                 //console.log(this.raycastWallsUVPixels[i][0] + " " + this.raycastWallsUVPixels[i][1] + " " + this.raycastWallsUVPixels[i][2] + " " + this.raycastWallsUVPixels[i][3]);
                 renderable.setElementPixelPositions(this.raycastWallsUVPixels[i][0], this.raycastWallsUVPixels[i][1], this.raycastWallsUVPixels[i][2], this.raycastWallsUVPixels[i][3]);
+                if(this.wallShadows)
+                {
+                    if(!this.raycastHitDirection[i])
+                    {
+                        renderable.setColor([0, 0, 0, 0.3]);
+                    }
+                }
                 
                 
                 

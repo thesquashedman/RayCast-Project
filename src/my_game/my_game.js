@@ -174,6 +174,22 @@ class MyGame extends engine.Scene {
         {
             this.mCamera.incHorizonLine(0.3);
         }
+        if(engine.input.isKeyPressed(engine.input.keys.Right))
+        {
+            this.mSquare.getXform().incXPosBy(0.075);
+        }
+        if(engine.input.isKeyPressed(engine.input.keys.Left))
+        {
+            this.mSquare.getXform().incXPosBy(-0.075);
+        }
+        if(engine.input.isKeyPressed(engine.input.keys.Up))
+        {
+            this.mSquare.getXform().incYPosBy(0.075);
+        }
+        if(engine.input.isKeyPressed(engine.input.keys.Down))
+        {
+            this.mSquare.getXform().incYPosBy(-0.075);
+        }
 
 
         /*

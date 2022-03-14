@@ -1,9 +1,10 @@
 "use strict";
 
 import SpriteRenderable from "./sprite_renderable.js";
+import SpriteAnimateRenderable from "./sprite_animate_renderable.js";
 import engine from "../index.js";
 
-class RCSpriteRenderable extends SpriteRenderable{
+class RCSpriteRenderable extends SpriteAnimateRenderable{
     constructor(myTexture) {
         super(myTexture);
         this.mSpriteSize = 1;
@@ -31,7 +32,6 @@ class RCSpriteRenderable extends SpriteRenderable{
         else{
             angle -= Math.PI;
         }
-        console.log((360 * angle)/(2 * Math.PI));
         let lowerBound = camera.getRayCasterAngle() - (1/2) * camera.getFOV();
         let upperBound = camera.getRayCasterAngle() + (1/2) * camera.getFOV();
         let inverseLower = false;
@@ -57,7 +57,6 @@ class RCSpriteRenderable extends SpriteRenderable{
         if(inverseLower || inverseUpper)
         {
 
-            console.log("inverse");
             let offset = 2* Math.PI - lowerBound;
             index = (resolution - 2) - Math.floor((offset + angle)/(upperBound + offset) * (resolution - 1));
             indexProportion = index - ((resolution - 2) - (offset + angle)/(upperBound + offset) * (resolution - 1));
@@ -71,15 +70,16 @@ class RCSpriteRenderable extends SpriteRenderable{
             indexProportion = 1- Math.abs(indexProportion);
             
         }
-        console.log(index + " Index");
-        console.log(indexProportion + " IndexProportion");
         if(index >= 0 && index < resolution - 1)
         {
-            console.log("within");
-            if(camera.getRaycastLengths()[index] > distance && camera.getRaycastLengths()[index + 1] > distance)
+            
+            if( (camera.getRaycastLengths()[index] > distance && camera.getRaycastLengths()[index + 1] > distance) || 
+                (camera.getRaycastLengths()[index] < 0 && camera.getRaycastLengths()[index + 1] > distance) ||
+                (camera.getRaycastLengths()[index] > distance && camera.getRaycastLengths()[index + 1] < 0) ||
+                (camera.getRaycastLengths()[index] < 0 && camera.getRaycastLengths()[index + 1] < 0)
+            )
             {
-                console.log("Visible");
-                //let renderable = new engine.SpriteRenderable(this.mTexture);
+                
                 
                 let scale = camera.getWCHeight() / distance;
                 if(!camera.getFishEye())
