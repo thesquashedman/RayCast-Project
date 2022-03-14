@@ -168,7 +168,7 @@ class MyGame extends engine.Scene {
         }
         if(engine.input.isKeyPressed(engine.input.keys.P))
         {
-            this.mCamera.incHorizonLine(0.3);
+            this.mCamera.moveHorizonLine(0.3);
         }
         if(engine.input.isKeyPressed(engine.input.keys.Right))
         {
@@ -209,7 +209,7 @@ class MyGame extends engine.Scene {
         this.mMapCharLineR.setFirstVertex(pos[0], pos[1]);
         this.mMapCharLineR.setSecondVertex(pos[0]+dist*Math.cos(ang), pos[1]+dist*Math.sin(ang));
 
-        this.mMsg.setText("Resolution: " + this.mCamera.getResolution().toFixed(0) + ", FOV:" + this.mCamera.getFOV().toFixed(4) + ", Fisheye: " + this.mCamera.getFishEye() + ", Effect1: " + this.mCamera.getEffect1());
+        this.mMsg.setText("Resolution: " + this.mCamera.getResolution().toFixed(0) + ", FOV:" + this.mCamera.getFOV().toFixed(4) + ", Fisheye: " + this.mCamera.getFishEye());
     }
 }
 
