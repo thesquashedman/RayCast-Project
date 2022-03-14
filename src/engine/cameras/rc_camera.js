@@ -24,6 +24,89 @@ class RCCamera extends Camera {
         this.wallShadows = true;
     }
 
+    setRayLengths(a)
+    {
+        if(a.length != this.resolution)
+        {
+            console.log("Warning, rays don't correspond to resolution");
+        }
+        this.rayLengths = a;
+    }
+
+    getRayLengths()
+    {
+        return this.rayLengths;
+    }
+
+    setRayHitPosition(a)
+    {
+        if(a.length != this.resolution)
+        {
+            console.log("Warning, rays don't correspond to resolution");
+        }
+        this.rayHitPosition = a;
+    }
+
+    getRayHitPosition()
+    {
+        return this.rayHitPosition;
+    }
+
+    setRayHitDirection(a)
+    {
+        if(a.length != this.resolution)
+        {
+            console.log("Warning, rays don't correspond to resolution");
+        }
+        this.rayHitDirection = a;
+    }
+
+    getRayHitDirection()
+    {
+        return this.rayHitDirection;
+    }
+
+    setRayAngles(a)
+    {
+        if(a.length != this.resolution)
+        {
+            console.log("Warning, rays don't correspond to resolution");
+        }
+        this.rayAngles = a;
+    }
+
+    getRayAngles()
+    {
+        return this.rayAngles;
+    }
+
+    setRayWallsHit(a)
+    {
+        if(a.length != this.resolution)
+        {
+            console.log("Warning, rays don't correspond to resolution");
+        }
+        this.rayWallsHit = a;
+    }
+
+    getRayWallsHit()
+    {
+        return this.rayWallsHit;
+    }
+
+    setRayWallsUVPixels(a)
+    {
+        if(a.length != this.resolution)
+        {
+            console.log("Warning, rays don't correspond to resolution");
+        }
+        this.rayWallsUVPixels = a;
+    }
+
+    getRayWallsUVPixels()
+    {
+        return this.rayWallsUVPixels;
+    }
 
 
     setFOV(fov)
@@ -129,10 +212,7 @@ class RCCamera extends Camera {
         this.horizonLine += d;
     }
 
-    getRayLengths()
-    {
-        return this.rayLengths;
-    }
+    
 
 
     
