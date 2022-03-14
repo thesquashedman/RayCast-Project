@@ -1,6 +1,6 @@
 "use strict";  // Operate in Strict mode such that variables must be declared before used!
 
-import Tile from "../engine/game_objects/tile.js";
+//import Tile from "../engine/game_objects/tile.js";
 import engine from "../engine/index.js";
 
 class MyGame extends engine.Scene {
@@ -47,9 +47,9 @@ class MyGame extends engine.Scene {
         );
         this.mCamera.setBackgroundColor([0, 0, 0, 1]);
 
-        this.tile1 = new Tile([this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300]);
-        this.tile2 = new Tile([this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20]);
-        this.tile3 = new Tile([this.kWall2, 0, 20, 0, 20], [this.kWall1, 0, 1300, 0, 1300], [this.kWall2, 20, 40, 20, 40], [this.kWall3, 0, 200, 0, 200]);
+        this.tile1 = new engine.Tile([this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300], [this.kWall1, 0, 1300, 0, 1300]);
+        this.tile2 = new engine.Tile([this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20], [this.kWall2, 0, 20, 0, 20]);
+        this.tile3 = new engine.Tile([this.kWall2, 0, 20, 0, 20], [this.kWall1, 0, 1300, 0, 1300], [this.kWall2, 20, 40, 20, 40], [this.kWall3, 0, 200, 0, 200]);
         this.tileArray = [
             [this.tile1, this.tile1, this.tile3, this.tile1, this.tile0, this.tile1],
             [this.tile1, this.tile2, this.tile0, this.tile2, this.tile0, this.tile1],
