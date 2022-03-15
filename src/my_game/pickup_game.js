@@ -48,7 +48,7 @@ class MyGame extends engine.Scene {
             100,                       // width of camera
             [0, 0, 640, 480]           // viewport (orgX, orgY, width, height)
         );
-        this.mCamera.setBackgroundColor([0, 0, 0, 1]);
+        this.mCamera.setBackgroundColor([0, 1, 1, 1]);
         this.mCamera.setResolution(120);
 
         this.tile1 = new Tile([this.kWall1, 0, 32, 0, 32], [this.kWall1, 0, 32, 0, 32], [this.kWall1, 0, 32, 0, 32], [this.kWall1, 0, 32, 0, 32]);
@@ -67,7 +67,7 @@ class MyGame extends engine.Scene {
         this.mCamera.Raycast(this.mGridMap);
 
         this.mMsg = new engine.FontRenderable("Score:");
-        this.mMsg.setColor([1, 1, 1, 1]);
+        this.mMsg.setColor([0, 0, 0, 1]);
         this.mMsg.getXform().setPosition(2, 2);
         this.mMsg.setTextHeight(2);
 
