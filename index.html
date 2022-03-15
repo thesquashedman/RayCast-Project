@@ -11,19 +11,22 @@
         <script type="text/javascript" src="src/lib/gl-matrix.js"></script>
 
         <!-- our game -->
-        <script type="module" src="./src/my_game/pickup_game.js"></script>
+        <script type="module" src="./src/my_game/my_game.js"></script>
     </head>
 
      <body>    
-        <canvas id="GLCanvas" width="640" height="480">
+        <canvas id="GLCanvas" width="640" height="720">
             <!-- GLCanvas is the area we will draw in: a 640x480 area. -->
             Your browser does not support the HTML5 canvas.
             <!-- this message will show only if WebGL clearing failed -->
         </canvas>
-        <b> <div> UWB CSS 452 w/ Professor Sung Raycaster Demo: Pick-Up Game!</div>
-            <div> By Team Doomers: Pavel Peev and Dane Ojala</div>
-            <div> WASD To Move and Turn </div> 
-            <div>Run around grabbing the coin to increase your score!</div>
+        <b> <div> WASD To Move and Turn (Also turns towards cursor) </div> 
+        <div>O/P for looking up and down (by changing the horizon line)</div>
+        <div>K/L change FOV </div>
+        <div>N/M change Resolution </div>
+        <div>F turns fisheye on/off </div>
+        <div>Space turns effect1 on/off (only works with FOVS greater than PI/2 and while fish eye is not on)</div>
+        <div> 1, 2, and 3 switch between textures</div>
         
         </b>
     </body>
