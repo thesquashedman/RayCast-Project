@@ -3,7 +3,7 @@
 //import Tile from "../engine/game_objects/tile.js";
 import engine from "../engine/index.js";
 import PlayerObject from "./objects/player_object.js";
-import Bullet from "./objects/Bullet.js";
+import Bullet from "./objects/bullet.js";
 import Renderable from "../engine/renderables/renderable.js";
 import RCSpriteRenderable from "../engine/renderables/rc_sprite_renderable.js";
 
